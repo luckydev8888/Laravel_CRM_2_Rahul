@@ -189,7 +189,7 @@ class ClientController extends Controller
                 $nestedData['tel2'] = $client->tel2;
                 $nestedData['town'] = $client->town;
                 $nestedData['area'] = $client->area;
-                $nestedData['samples'] = $client->samples ? 'Yes' : 'No';
+                $nestedData['samples'] = $client->samples;
                 $nestedData['display'] = $client->display ? 'Yes' : 'No';
                 $nestedData['prices'] = $client->prices ? 'Yes' : 'No';
                 $nestedData['brand'] = $client->brand;

@@ -818,7 +818,28 @@ $(document).ready(function () {
         },{
             targets: 12,
             data: "samples",
-            width: '10px',
+            width: '50px',
+            render: function (data, type, row) {
+                if (!data) return data; // Return if empty
+
+                // Parse the date as a local date to prevent timezone issues
+                const dateParts = data.split('-'); // Assuming `data` is in `YYYY-MM-DD` format
+                const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]); // Month is 0-based
+
+                // Format the date to `03-Sep-2022`
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = date.toLocaleString('en-US', { month: 'short' });
+                const year = date.getFullYear();
+                const formattedDate = `${day}-${month}-${year}`;
+
+                // Render the formatted date with a calendar icon
+                return `
+                    <span class="date-cell" data-date="${data}">
+                        ${formattedDate}
+                        <i class="fas fa-calendar-alt calendar-icon" id="calendar-icon" style="cursor: pointer; margin-left: 5px;"></i>
+                    </span>
+                `;
+            },
         },{
             targets: 13,
             data: "display",
