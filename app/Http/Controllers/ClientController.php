@@ -226,14 +226,30 @@ class ClientController extends Controller
     public function updateDate(Request $request){
         $request->validate([
             'id' => 'required|exists:clients,id',
-            'date' => 'required|date_format:Y-m-d', // Ensure the date is valid
+            'date' => 'required|date_format:Y-m-d', // Validate the date format
         ]);
 
-        // Find the client and update the date
+        // Update the 'date' column in the database
         $client = Client::find($request->input('id'));
-        $client->date = $request->input('date');
+        $client->date = $request->input('date'); // Update the 'date' column
         $client->save();
 
         return response()->json(['success' => true, 'message' => 'Date updated successfully']);
     }
+
+    public function updateSample(Request $request){
+        $request->validate([
+            'id' => 'required|exists:clients,id',
+            'date' => 'required|date_format:Y-m-d', // Validate the date format
+        ]);
+
+        // Update the 'samples' column in the database
+        $client = Client::find($request->input('id'));
+        $client->samples = $request->input('date'); // Update the 'samples' column
+        $client->save();
+
+        return response()->json(['success' => true, 'message' => 'Sample date updated successfully']);
+    }
+
+
 }

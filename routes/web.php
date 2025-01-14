@@ -31,6 +31,7 @@ Route::post('/contacts/editcolumn', [App\Http\Controllers\ClientController::clas
 Route::get('/contacts/whatsapp', [App\Http\Controllers\ClientController::class, 'whatsapp']);
 Route::post('/contacts/check-phone', [App\Http\Controllers\ClientController::class, 'checkPhone']);
 Route::post('/contacts/update-date', [App\Http\Controllers\ClientController::class, 'updateDate']);
+Route::post('/contacts/update-sample', [App\Http\Controllers\ClientController::class, 'updateSample']);
 
 
 Route::get('/users', [App\Http\Controllers\UserController::class, 'index'])->name('users');

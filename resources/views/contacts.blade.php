@@ -103,6 +103,11 @@
     .iti .iti__selected-flag {
         height: 100%; /* Make flag dropdown match input height */
     }
+
+    .date-column, .sample-column {
+        text-align: center; /* Change to left or right if needed */
+        vertical-align: middle; /* Optional: Ensures alignment vertically */
+    }
 </style>
 @endsection
 
@@ -208,8 +213,8 @@
                                         <option value="" ></option>
                                         <option value="No contact" >No Contact</option>
                                         <option value="Call 1" >Call 1</option>
-                                        <option value="SEND SAMPLE" >SEND SAMPLE</option>
-                                        <option value="SAMPLE TESTING" >SAMPLE TESTING</option>
+                                        <option value="Send Sample" >Send Sample</option>
+                                        <option value="Sample Testing" >Sample Testing</option>
                                         <option value="Standby" >Standby</option>
                                         <option value="Almost" >Almost</option>
                                         <option value="Customer" >Customer</option>
@@ -323,12 +328,20 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-6 form-group">
+                            <div class="row">
+                                <label for="samples" class="col-sm-4 text-end m-auto">Samples</label>
+                                <div class="col-sm-8">
+                                    <input type="text" id="samples" name="samples" class="form-control">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="row mt-5">
                         <div class="col-md-12 text-center">
-                            <label for="samples" class="ms-10">Samples: &nbsp; &nbsp;</label>
+                            <!-- <label for="samples" class="ms-10">Samples: &nbsp; &nbsp;</label>
                             <input type="radio" name="samples" value="1" >Yes &nbsp;
-                            <input type="radio" name="samples" value="0" checked>No &nbsp;
+                            <input type="radio" name="samples" value="0" checked>No &nbsp; -->
                             <label for="prices" class="ms-10">Price: &nbsp; &nbsp;</label>
                             <input type="radio" name="prices" value="1" >Yes &nbsp;
                             <input type="radio" name="prices" value="0" checked>No &nbsp;
@@ -414,8 +427,8 @@
                                         <option value="" ></option>
                                         <option value="No contact" >No Contact</option>
                                         <option value="Call 1" >Call 1</option>
-                                        <option value="SEND SAMPLE" >SEND SAMPLE</option>
-                                        <option value="SAMPLE TESTING" >SAMPLE TESTING</option>
+                                        <option value="Send Sample" >Send Sample</option>
+                                        <option value="Sample Testing" >Sample Testing</option>
                                         <option value="Standby" >Standby</option>
                                         <option value="Almost" >Almost</option>
                                         <option value="Customer" >Customer</option>
@@ -523,12 +536,20 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-6 form-group">
+                            <div class="row">
+                                <label for="samples" class="col-sm-4 text-end m-auto">Samples</label>
+                                <div class="col-sm-8">
+                                    <input type="text" id="edit_samples" name="samples" class="form-control">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="row mt-5">
                         <div class="col-md-12 text-center">
-                            <label for="samples" class="ms-10">Samples: &nbsp; &nbsp;</label>
+                            <!-- <label for="samples" class="ms-10">Samples: &nbsp; &nbsp;</label>
                             <input type="radio" name="samples" value="1" >Yes &nbsp;
-                            <input type="radio" name="samples" value="0" checked>No &nbsp;
+                            <input type="radio" name="samples" value="0" checked>No &nbsp; -->
                             <label for="prices" class="ms-10">Price: &nbsp; &nbsp;</label>
                             <input type="radio" name="prices" value="1" >Yes &nbsp;
                             <input type="radio" name="prices" value="0" checked>No &nbsp;
@@ -734,31 +755,37 @@ $(document).ready(function () {
             data: "key",
             width: '8px',
         },{
-            targets: 3, // Date column index
+            targets: 3, // Index of the 'date' column
             data: "date",
-            width: "30px",
+            width: "100px",
+            className: 'date-column',
             render: function (data, type, row) {
-                if (!data) return data; // Return if empty
+                if (!data) {
+                    // Render a blank cell with the calendar icon if no data exists
+                    return `
+                        <span class="date-cell" data-id="${row.id}" data-date="${data || ''}">
+                            <i class="fas fa-calendar-alt date-picker-icon" style="cursor: pointer; margin-left: 5px;"></i>
+                        </span>
+                    `;
+                } else {
+                    const dateParts = data.split('-'); // Assuming `data` is in `YYYY-MM-DD` format
+                    const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]); // Month is 0-based
 
-                // Parse the date as a local date to prevent timezone issues
-                const dateParts = data.split('-'); // Assuming `data` is in `YYYY-MM-DD` format
-                const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]); // Month is 0-based
+                    // Format the date to `03-Sep-2022`
+                    const day = date.getDate().toString().padStart(2, '0');
+                    const month = date.toLocaleString('en-US', { month: 'short' });
+                    const year = date.getFullYear();
+                    const formattedDate = `${day}-${month}-${year}`;
 
-                // Format the date to `03-Sep-2022`
-                const day = date.getDate().toString().padStart(2, '0');
-                const month = date.toLocaleString('en-US', { month: 'short' });
-                const year = date.getFullYear();
-                const formattedDate = `${day}-${month}-${year}`;
-
-                // Render the formatted date with a calendar icon
-                return `
-                    <span class="date-cell" data-date="${data}">
-                        ${formattedDate}
-                        <i class="fas fa-calendar-alt calendar-icon" id="calendar-icon" style="cursor: pointer; margin-left: 5px;"></i>
-                    </span>
-                `;
+                    // Render the date with a calendar icon if data exists
+                    return `
+                        <span class="date-cell" data-id="${row.id}" data-date="${data}">
+                            ${formattedDate}
+                            <i class="fas fa-calendar-alt date-picker-icon" style="cursor: pointer; margin-left: 5px;"></i>
+                        </span>
+                    `;
+                }
             },
-
         },{
             targets: 4,
             data: "status",
@@ -816,29 +843,35 @@ $(document).ready(function () {
             data: "area",
             width: '60px',
         },{
-            targets: 12,
+            targets: 12, // Index of the 'samples' column
             data: "samples",
-            width: '50px',
+            width: "100px",
+            className: 'sample-column',
             render: function (data, type, row) {
-                if (!data) return data; // Return if empty
+                if (!data) {
+                    // Render a blank cell with the calendar icon if no data exists
+                    return `
+                        <span class="sample-cell" data-id="${row.id}" data-samples="${data || ''}">
+                            <i class="fas fa-calendar-alt sample-date-picker" style="cursor: pointer; margin-left: 5px;"></i>
+                        </span>
+                    `;
+                } else {
+                    const dateParts = data.split('-'); // Assuming `data` is in `YYYY-MM-DD` format
+                    const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]); // Month is 0-based
 
-                // Parse the date as a local date to prevent timezone issues
-                const dateParts = data.split('-'); // Assuming `data` is in `YYYY-MM-DD` format
-                const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]); // Month is 0-based
-
-                // Format the date to `03-Sep-2022`
-                const day = date.getDate().toString().padStart(2, '0');
-                const month = date.toLocaleString('en-US', { month: 'short' });
-                const year = date.getFullYear();
-                const formattedDate = `${day}-${month}-${year}`;
-
-                // Render the formatted date with a calendar icon
-                return `
-                    <span class="date-cell" data-date="${data}">
-                        ${formattedDate}
-                        <i class="fas fa-calendar-alt calendar-icon" id="calendar-icon" style="cursor: pointer; margin-left: 5px;"></i>
-                    </span>
-                `;
+                    // Format the date to `03-Sep-2022`
+                    const day = date.getDate().toString().padStart(2, '0');
+                    const month = date.toLocaleString('en-US', { month: 'short' });
+                    const year = date.getFullYear();
+                    const formattedDate = `${day}-${month}-${year}`;
+                    // Render the date with a calendar icon if data exists
+                    return `
+                        <span class="sample-cell" data-id="${row.id}" data-samples="${data}">
+                            ${formattedDate}
+                            <i class="fas fa-calendar-alt sample-date-picker" style="cursor: pointer; margin-left: 5px;"></i>
+                        </span>
+                    `;
+                }
             },
         },{
             targets: 13,
@@ -866,7 +899,7 @@ $(document).ready(function () {
 
     table.MakeCellsEditable({
         onUpdate: myCallbackFunction,
-        columns: [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+        columns: [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16],
         inputCss:'my-input-class',
         confirmationButton: { 
             confirmCss: 'my-confirm-class',
@@ -877,21 +910,23 @@ $(document).ready(function () {
                 "column": 4, 
                 "type": "list",
                 "options":[
-                    { "value": "No contact", "display": "No contact" },
-                    { "value": "Standby", "display": "Standby" },
-                    { "value": "COCKROACH", "display": "COCKROACH" },
+                    { "value": "No contact", "display": "No Contact" },
                     { "value": "Call 1", "display": "Call 1" },
-                    { "value": "Call 2", "display": "Call 2" },
-                    { "value": "Call 3", "display": "Call 3" },
+                    { "value": "Call 2", "display": "Send Sample" },
+                    { "value": "Call 3", "display": "Sample Testing" },
+                    { "value": "Standby", "display": "Standby" },
                     { "value": "Almost", "display": "Almost" },
                     { "value": "Customer", "display": "Customer" },
                     { "value": "Not interested", "display": "Not interested" },
                     { "value": "Not interesting", "display": "Not interesting" },
+                    { "value": "COCKROACH", "display": "COCKROACH" },
                 ]
             }
         ],
     })
     $('#date').datepicker({ dateFormat: "yy-mm-dd" });
+    $('#samples').datepicker({ dateFormat: "yy-mm-dd" });
+    $('#edit_samples').datepicker({ dateFormat: "yy-mm-dd" });
     $('#edit_date').datepicker({ dateFormat: "yy-mm-dd" });
 
     function checkDuplicatePhoneNumber(phone, id, callback) {
@@ -937,49 +972,115 @@ $(document).ready(function () {
         }
     });
 
-    $('#contacts').on('click', '.calendar-icon', function () {
+    $('#contacts').on('click', '.date-picker-icon', function () {
         const dateCell = $(this).closest('.date-cell');
-        const currentDate = dateCell.data('date');
+        const rowId = dateCell.data('id'); // Get the row ID
+        const currentDate = dateCell.data('date'); // Get the current date
 
         // Create a temporary input field for the date picker
-        const dateInput = $('<input type="text" class="date-picker-temp" />').val(currentDate);
+        const dateInput = $('<input type="text" class="date-picker-temp form-control" />').val(currentDate);
 
-        // Replace the current date span with the input field
+        // Replace the current cell content with the input field
         dateCell.html(dateInput);
 
         // Initialize jQuery UI Datepicker
         dateInput.datepicker({
-            dateFormat: "yy-mm-dd", // Adjust the format as needed
+            dateFormat: "yy-mm-dd", // Match your backend's date format
             onClose: function (selectedDate) {
-                // Update the date in the cell after selection
-                dateCell.html(`
-                    ${selectedDate}
-                    <i class="fas fa-calendar-alt calendar-icon" style="cursor: pointer; margin-left: 5px;"></i>
-                `);
+                if (!selectedDate) {
+                    // Restore the original content if no date is selected
+                    dateCell.html(`${currentDate || ''} <i class="fas fa-calendar-alt date-picker-icon" style="cursor: pointer; margin-left: 5px;"></i>`);
+                    return;
+                }
 
-                // Save the updated date to the backend
-                const rowData = table.row(dateCell.closest('tr')).data();
-                const rowId = rowData.id;
+                // Update the cell content with the selected date
+                dateCell.html(`${selectedDate} <i class="fas fa-calendar-alt date-picker-icon" style="cursor: pointer; margin-left: 5px;"></i>`);
 
+                // Send the selected date to the backend via AJAX
                 $.ajax({
-                    url: '/contacts/update-date', // Your endpoint to update date
+                    url: '/contacts/update-date', // Endpoint for updating the 'date' column
                     method: 'POST',
                     data: {
                         id: rowId,
                         date: selectedDate,
-                        _token: "{{ csrf_token() }}",
+                        _token: "{{ csrf_token() }}", // CSRF token for security
                     },
                     success: function (response) {
-                        console.log('Date updated successfully:', response);
-                        window.location.reload();
+                        if (response.success) {
+                            alert('Date updated successfully');
+                            // Optionally reload the DataTable
+                            table.ajax.reload();
+                        } else {
+                            alert('Failed to update date');
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('Error updating date');
+                        console.error(xhr.responseText);
                     },
                 });
             },
         });
 
-        // Open the date picker
+        // Open the date-picker
         dateInput.datepicker('show');
     });
+
+
+    $('#contacts').on('click', '.sample-date-picker', function () {
+        const dateCell = $(this).closest('.sample-cell');
+        const rowId = dateCell.data('id'); // Get the row ID
+        const currentDate = dateCell.data('samples'); // Get the current sample date
+
+        // Create a temporary input field for the date picker
+        const dateInput = $('<input type="text" class="date-picker-temp form-control" />').val(currentDate);
+
+        // Replace the current cell content with the input field
+        dateCell.html(dateInput);
+
+        // Initialize jQuery UI Datepicker
+        dateInput.datepicker({
+            dateFormat: "yy-mm-dd", // Match your backend's date format
+            onClose: function (selectedDate) {
+                if (!selectedDate) {
+                    // Restore the original content if no date is selected
+                    dateCell.html(`${currentDate || ''} <i class="fas fa-calendar-alt sample-date-picker" style="cursor: pointer; margin-left: 5px;"></i>`);
+                    return;
+                }
+
+                // Update the cell content with the selected date
+                dateCell.html(`${selectedDate} <i class="fas fa-calendar-alt sample-date-picker" style="cursor: pointer; margin-left: 5px;"></i>`);
+
+                // Send the selected date to the backend via AJAX
+                $.ajax({
+                    url: '/contacts/update-sample', // Endpoint for updating the 'samples' column
+                    method: 'POST',
+                    data: {
+                        id: rowId,
+                        date: selectedDate,
+                        _token: "{{ csrf_token() }}", // CSRF token for security
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Sample date updated successfully');
+                            // Optionally reload the DataTable
+                            table.ajax.reload();
+                        } else {
+                            alert('Failed to update sample date');
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('Error updating sample date');
+                        console.error(xhr.responseText);
+                    },
+                });
+            },
+        });
+
+        // Open the date-picker
+        dateInput.datepicker('show');
+    });
+
 
 });
 </script>

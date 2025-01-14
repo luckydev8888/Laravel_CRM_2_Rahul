@@ -1,0 +1,4 @@
+.date-column, .sample-column {
+    text-align: center; /* Change to left or right if needed */
+    vertical-align: middle; /* Optional: Ensures alignment vertically */
+}
