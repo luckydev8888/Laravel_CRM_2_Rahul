@@ -34,6 +34,11 @@ Route::post('/contacts/update-date', [App\Http\Controllers\ClientController::cla
 Route::post('/contacts/update-sample', [App\Http\Controllers\ClientController::class, 'updateSample']);
 
 
+Route::get('/pipeline', [App\Http\Controllers\PipelineController::class, 'index'])->name('pipeline');
+Route::get('/pipeline/update', [App\Http\Controllers\PipelineController::class, 'update'])->name('pipeline.update');
+Route::get('/pipeline/{id}/getdata', [App\Http\Controllers\PipelineController::class, 'getdata'])->name('pipeline.getdata');
+
+
 Route::get('/users', [App\Http\Controllers\UserController::class, 'index'])->name('users');
 Route::post('/users/save', [App\Http\Controllers\UserController::class, 'save']);
 Route::post('/users/add', [App\Http\Controllers\UserController::class, 'add']);
