@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Models\User;
-
+use Carbon\Carbon;
 
 class PipelineController extends Controller
 {
@@ -20,6 +20,11 @@ class PipelineController extends Controller
 
         // Fetch clients grouped by status
         $clients = Client::whereIn('status', $defaultStatuses)->get();
+
+        // Format the date for each client
+        $clients->each(function ($client) {
+            $client->formatted_date = $client->date ? Carbon::parse($client->date)->format('d M Y') : null;
+        });
 
         // Group clients by their status and ensure keys match $defaultStatuses
         $statuses = collect($defaultStatuses)
@@ -58,11 +63,6 @@ class PipelineController extends Controller
             'users' => User::all()
         ]);
     }
-
-
-    
-
-
 
     public function update(Request $request){
         $request->validate([
@@ -103,4 +103,67 @@ class PipelineController extends Controller
         return response()->json($contact);
     }
 
+    public function edit(Request $request){
+        // Validate the request data
+        $request->validate([
+            'id' => 'required|exists:clients,id',
+            'contact' => 'required|string|max:255',
+            'country' => 'nullable|string|max:255',
+            'assigned' => 'nullable|exists:users,id',
+            'status' => 'nullable|string|max:255',
+            'date' => 'nullable|date',
+            'company' => 'nullable|string|max:255',
+            'tel1' => 'nullable|string|max:255',
+            'tel2' => 'nullable|string|max:255',
+            'town' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'area' => 'nullable|string|max:255',
+            'brand' => 'nullable|string|max:255',
+            'score' => 'nullable|string|max:1',
+            'samples' => 'nullable|string|max:255',
+            'comments' => 'nullable|string',
+        ]);
+
+        // Find the client by ID
+        $client = Client::findOrFail($request->id);
+
+        // Update the client record
+        $client->update([
+            'contact' => $request->contact,
+            'country' => $request->country,
+            'assigned' => $request->assigned,
+            'status' => $request->status,
+            'date' => $request->date,
+            'company' => $request->company,
+            'tel1' => $request->tel1,
+            'tel2' => $request->tel2,
+            'town' => $request->town,
+            'email' => $request->email,
+            'area' => $request->area,
+            'brand' => $request->brand,
+            'score' => $request->score,
+            'samples' => $request->samples,
+            'comments' => $request->comments,
+        ]);
+
+        // Redirect back with success message
+        return redirect()->back()->with('success', 'Contact updated successfully!');
+    }
+
+    public function updateStatus(Request $request){
+        // Validate the request data
+        $request->validate([
+            'contact_ids' => 'required|array',
+            'contact_ids.*' => 'exists:clients,id',
+            'status' => 'required|string|max:255',
+        ]);
+
+        $contactIds = $request->input('contact_ids');
+        $status = $request->input('status');
+
+        // Update the status for the selected contacts
+        Client::whereIn('id', $contactIds)->update(['status' => $status]);
+
+        return response()->json(['success' => true, 'message' => 'Status updated successfully!']);
+    }
 }

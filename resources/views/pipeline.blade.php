@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.min.css"/>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet"/>
 
 
 
@@ -15,9 +16,36 @@
         margin-top: 20px;
     }
 
+    .filter-section {
+        display: flex;
+        gap: 20px; /* Adjust spacing between filter groups */
+        align-items: center;
+        padding: 10px 0;
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 10px; /* Space between label and select/input */
+    }
+
+    .filter-label {
+        font-size: 14px;
+        font-weight: bold;
+        white-space: nowrap; /* Prevent label text from wrapping */
+    }
+
+    .filter-select, .filter-input {
+        width: 200px; /* Adjust width as needed */
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 5px;
+    }
+
     .status-column {
         flex: 1;
-        min-width: 300px;
+        min-width: 280px;
         background-color: #f8f9fa;
         border: 1px solid #ddd;
         border-radius: 5px;
@@ -63,23 +91,21 @@
     }
 
     .contact-card .row {
-        display: flex;
-        width: 100%;
-        justify-content: space-between;
-        padding-left: 40px; /* Add padding to leave space for the checkbox */
-    }
-
-    .contact-card .col {
-        flex: 1;
-        margin-right: 10px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between; /* Distribute content evenly in the column */
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Two equal columns */
+        grid-gap: 10px; /* Add spacing between rows and columns */
+        padding-left: 40px; /* Leave space for the checkbox */
+        align-items: center; /* Vertically align items */
     }
 
     .contact-card p {
-        margin: 5px 0;
+        margin: 0; /* Remove unnecessary margin */
         word-wrap: break-word; /* Handle long text gracefully */
+    }
+
+    .contact-card i {
+        margin-left: 5px;
+        color: green; /* Set icon color */
     }
 
     .contact-card .edit-button {
@@ -137,6 +163,10 @@
         border-bottom: 1px solid #ddd;
     }
 
+    .filter-group {
+        margin-left: 30px;
+    }
+
     .filter-section select,
     .filter-section input {
         padding: 5px;
@@ -181,6 +211,7 @@
         top: 0;
         z-index: 10;
     }
+
 </style>
 @endsection
 
@@ -189,27 +220,27 @@
 <div>
     <!-- Filter and Action Buttons -->
     <div class="filter-section">
-        <div>
-            <label for="city-filter">City: </label>
-            <select id="city-filter">
+        <div class="filter-group">
+            <label for="city-filter" class="filter-label">City:</label>
+            <select id="city-filter" class="filter-select">
                 <option value="">All</option>
                 @foreach ($cities as $city)
                     <option value="{{ $city }}" {{ $selectedCity === $city ? 'selected' : '' }}>{{ $city }}</option>
                 @endforeach
             </select>
         </div>
-        <div>
-            <label for="search-box">Search: </label>
-            <input type="text" id="search-box" value="{{ $searchQuery }}" placeholder="Search...">
+        <div class="filter-group">
+            <label for="search-box" class="filter-label">Search:</label>
+            <input type="text" id="search-box" value="{{ $searchQuery }}" placeholder="Search..." class="filter-input">
         </div>
         <div class="action-buttons-container">
             <button id="btn-whatsapp" class="btn btn-success"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
             <button id="btn-email" class="btn btn-primary"><i class="fa-solid fa-envelope"></i> Email</button>
-            <button id="btn-move-left" class="btn btn-warning"><i class="fa-solid fa-arrow-left"></i> Move Left</button>
-            <button id="btn-move-right" class="btn btn-warning">Move Right <i class="fa-solid fa-arrow-right"></i></button>
+            <button id="btn-move-left" class="btn btn-warning"><i class="fa-solid fa-arrow-left"></i> Move</button>
+            <button id="btn-move-right" class="btn btn-warning">Move <i class="fa-solid fa-arrow-right"></i></button>
 
             <!-- New Buttons for Changing Status -->
-            <div class="status-buttons-container">
+            <div class="status-buttons-container" style="margin-right:30px;">
                 <button class="btn btn-secondary change-status" data-status="Customer">Customer</button>
                 <button class="btn btn-secondary change-status" data-status="Not interested">Not interested</button>
                 <button class="btn btn-secondary change-status" data-status="Not interesting">Not interesting</button>
@@ -239,18 +270,14 @@
                 
 
                 <div class="row">
-                    <div class="col">
-                        <p>{{ $contact->contact }}</p>
-                        <p>{{ $contact->tel1 }} <i class="fa-brands fa-whatsapp"></i></p>
-                        <p>{{ $contact->town }}</p>
-                        <p>#{{ $contact->id }}</p>
-                    </div>
-                    <div class="col">
-                        <p>{{ $contact->company }}</p>
-                        <p>{{ $contact->tel2 }} <i class="fa-brands fa-whatsapp"></i></p>
-                        <p>{{ $contact->area }}</p>
-                        <p>{{ $contact->date }} <i class="fa-solid fa-calendar"></i></p>
-                    </div>
+                    <p>{{ $contact->contact }}</p>
+                    <p>{{ $contact->company }}</p>
+                    <p>{{ $contact->tel1 }} <i class="fa-brands fa-whatsapp"></i></p>
+                    <p>{{ $contact->tel2 }} <i class="fa-brands fa-whatsapp"></i></p>
+                    <p>{{ $contact->town }}</p>
+                    <p>{{ $contact->area }}</p>
+                    <p>#{{ $contact->id }}</p>
+                    <p>{{ $contact->formatted_date ?? 'N/A' }} <i class="fa-solid fa-calendar"></i></p>
                 </div>
 
                 <!-- Edit Button -->
@@ -274,7 +301,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-5">
-                <form action="{{ url('/pipeline/contact/edit') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('pipeline.contact.edit') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row justify-content-between">
                         <div class="col-md-6 form-group">
@@ -314,7 +341,7 @@
                             <div class="row">                       
                                 <label class="col-sm-4 text-end m-auto" for="status">STATUS</label>
                                 <div class="col-sm-8">
-                                    <select name="status" id="status" class="form-control">
+                                    <select name="status" id="edit_status" class="form-control">
                                         <option value="" ></option>
                                         <option value="No contact" >No Contact</option>
                                         <option value="Call 1" >Call 1</option>
@@ -482,8 +509,34 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js"></script>
 <script>
     $(document).ready(function () {
+
+        // Initialize Select2 for the city filter with direct input
+        $('#city-filter').select2({
+            tags: true, // Enable custom input
+            placeholder: "Select or type a city", // Placeholder text
+            allowClear: true, // Clear button option
+            width: '100%' // Adjust width to fit the container
+        });
+
+        // Handle changes in the city select box
+        $('#city-filter').on('change', function () {
+            const city = $(this).val();
+            const search = $('#search-box').val();
+            window.location.href = `/pipeline?city=${city}&search=${search}`;
+        });
+
+        // Search box - Press Enter to display results
+        $('#search-box').on('keypress', function (e) {
+            if (e.which === 13) { // 13 is the keycode for Enter
+                const city = $('#city-filter').val();
+                const search = $(this).val();
+                window.location.href = `/pipeline?city=${city}&search=${search}`;
+            }
+        });
+
         const edit_tel1Input = document.querySelector("#edit_tel1");
         const edit_tel2Input = document.querySelector("#edit_tel2");
 
@@ -515,72 +568,6 @@
             const search = searchBox.val();
             window.location.href = `/pipeline?city=${city}&search=${search}`;
         });
-
-        // Handle "Move Left" and "Move Right" buttons
-        $('#btn-move-left').on('click', function () {
-            moveContacts('left');
-        });
-
-        $('#btn-move-right').on('click', function () {
-            moveContacts('right');
-        });
-
-        function moveContacts(direction) {
-            const selectedContacts = $('.contact-card .checkbox:checked')
-                .map(function () {
-                    return $(this).closest('.contact-card').data('contactId');
-                })
-                .get();
-
-            if (selectedContacts.length === 0) {
-                alert('Please select at least one contact to move.');
-                return;
-            }
-
-            // $.ajax({
-            //     url: '/pipeline/update',
-            //     method: 'POST',
-            //     headers: {
-            //         'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            //     },
-            //     contentType: 'application/json',
-            //     data: JSON.stringify({ contact_ids: selectedContacts, direction }),
-            //     success: function (data) {
-            //         if (data.success) {
-            //             alert('Contacts moved successfully!');
-            //             window.location.reload();
-            //         } else {
-            //             alert(data.message);
-            //         }
-            //     },
-            //     error: function (xhr) {
-            //         console.error('Error:', xhr.responseText);
-            //         alert('An error occurred while moving contacts. Check console for details.');
-            //     },
-            // });
-            // $.ajax({
-            //     url: '/contacts/update-sample', // Endpoint for updating the 'samples' column
-            //     method: 'POST',
-            //     data: {
-            //         id: rowId,
-            //         date: selectedDate,
-            //         _token: "{{ csrf_token() }}", // CSRF token for security
-            //     },
-            //     success: function (response) {
-            //         if (response.success) {
-            //             alert('Sample date updated successfully');
-            //             // Optionally reload the DataTable
-            //             table.ajax.reload();
-            //         } else {
-            //             alert('Failed to update sample date');
-            //         }
-            //     },
-            //     error: function (xhr) {
-            //         alert('Error updating sample date');
-            //         console.error(xhr.responseText);
-            //     },
-            // });
-        }
 
         // Function to open and populate the edit modal
         window.editContact = function (contactId) {
@@ -616,7 +603,100 @@
             },
         });
     };
+
+     // Handle "Move Left" and "Move Right" buttons
+     $('#btn-move-left').on('click', function () {
+        moveContacts('left');
     });
+
+    $('#btn-move-right').on('click', function () {
+        moveContacts('right');
+    });
+
+    function moveContacts(direction) {
+        const selectedContacts = $('.contact-card .checkbox:checked')
+            .map(function () {
+                return $(this).closest('.contact-card').data('contactId');
+            })
+            .get();
+
+        if (selectedContacts.length === 0) {
+            alert('Please select at least one contact to move.');
+            return;
+        }
+
+        const confirmation = confirm(
+            `Are you sure you want to move the selected contacts?`
+        );
+        if (!confirmation) {
+            return; // Exit if the user cancels
+        }
+
+        $.ajax({
+            url: '/pipeline/update', // Endpoint for updating the contact's status
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+            },
+            contentType: 'application/json',
+            data: JSON.stringify({ contact_ids: selectedContacts, direction }),
+            success: function (response) {
+                if (response.success) {
+                    alert('Contacts moved successfully!');
+                    window.location.reload(); // Reload the page to reflect updated statuses
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (xhr) {
+                console.error('Error:', xhr.responseText);
+                alert('An error occurred while moving contacts. Check the console for details.');
+            },
+        });
+    }
+
+    $('.change-status').on('click', function () {
+        const status = $(this).data('status');
+        const selectedContacts = $('.contact-card .checkbox:checked')
+            .map(function () {
+                return $(this).closest('.contact-card').data('contactId');
+            })
+            .get();
+
+        if (selectedContacts.length === 0) {
+            alert('Please select at least one contact to change the status.');
+            return;
+        }
+
+        const confirmation = confirm(`Are you sure you want to update the status to "${status}" for the selected contacts?`);
+        if (!confirmation) {
+            return; // Exit if the user cancels
+        }
+
+        // AJAX call to update the status
+        $.ajax({
+            url: '/pipeline/update-status',
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+            },
+            contentType: 'application/json',
+            data: JSON.stringify({ contact_ids: selectedContacts, status }),
+            success: function (response) {
+                if (response.success) {
+                    alert('Status updated successfully!');
+                    window.location.reload(); // Reload the page to reflect updated statuses
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (xhr) {
+                console.error('Error:', xhr.responseText);
+                alert('An error occurred while updating the status. Check the console for details.');
+            },
+        });
+    });
+});
 
 </script>
 @endsection
