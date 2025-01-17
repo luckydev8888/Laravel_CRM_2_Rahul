@@ -41,11 +41,7 @@ Route::post('/pipeline/contact/edit', [App\Http\Controllers\PipelineController::
 Route::post('/pipeline/update-status', [App\Http\Controllers\PipelineController::class, 'updateStatus'])->name('pipeline.updateStatus');
 Route::post('/pipeline/send-email', [App\Http\Controllers\PipelineController::class, 'sendEmail'])->name('pipeline.sendEmail');
 Route::post('/pipeline/update-date', [App\Http\Controllers\PipelineController::class, 'updateDate'])->name('pipeline.updateDate');
-
-
-
-
-
+Route::post('/pipeline/send-whatsapp', [App\Http\Controllers\PipelineController::class, 'sendWhatsapp'])->name('pipeline.send.whatsapp');
 
 
 Route::get('/users', [App\Http\Controllers\UserController::class, 'index'])->name('users');

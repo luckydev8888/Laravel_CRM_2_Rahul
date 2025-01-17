@@ -222,6 +222,34 @@ class PipelineController extends Controller
     
         return response()->json(['success' => true, 'message' => 'Date updated successfully!']);
     }
+
+    public function sendWhatsapp(Request $request) {
+        $request->validate([
+            'from_whatsapp' => 'required|string',
+            'to_whatsapp' => 'required|string',
+            'whatsapp_subject' => 'nullable|string|max:255',
+            'whatsapp_message' => 'required|string',
+            'whatsapp_attachment' => 'nullable|file|max:10240', // Max file size: 10MB
+        ]);
+    
+        $fromWhatsapp = $request->input('from_whatsapp');
+        $toWhatsapp = $request->input('to_whatsapp');
+        $subject = $request->input('whatsapp_subject');
+        $message = $request->input('whatsapp_message');
+        $attachment = $request->file('whatsapp_attachment');
+    
+        // Use a WhatsApp API service (e.g., Twilio, Vonage) to send the message
+        $whatsappService = new WhatsAppService(); // Replace with your implementation
+    
+        $result = $whatsappService->sendMessage($fromWhatsapp, $toWhatsapp, $message, $subject, $attachment);
+    
+        if ($result['success']) {
+            return response()->json(['success' => true, 'message' => 'WhatsApp message sent successfully!']);
+        } else {
+            return response()->json(['success' => false, 'message' => $result['error'] ?? 'Failed to send message.']);
+        }
+    }
+    
     
 
 }

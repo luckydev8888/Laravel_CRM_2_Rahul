@@ -550,6 +550,50 @@
     </div>
 </div>
 
+<div class="modal fade" id="whatsappModal" tabindex="-1" aria-labelledby="whatsappModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="whatsappModalLabel">Send WhatsApp Message</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="whatsappForm" enctype="multipart/form-data">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="from_whatsapp" class="form-label">From WhatsApp Number</label>
+                        <input type="text" class="form-control" id="from_whatsapp" name="from_whatsapp" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="to_whatsapp" class="form-label">To WhatsApp Number</label>
+                        <input type="text" class="form-control" id="to_whatsapp" name="to_whatsapp" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="whatsapp_subject" class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="whatsapp_subject" name="whatsapp_subject" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="whatsapp_message" class="form-label">Message</label>
+                        <textarea class="form-control" id="whatsapp_message" name="whatsapp_message" rows="5" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="whatsapp_attachment" class="form-label">Attachment (Optional)</label>
+                        <input type="file" class="form-control" id="whatsapp_attachment" name="whatsapp_attachment">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
 
@@ -866,6 +910,60 @@
         const contactId = $(this).closest('.contact-card').data('contactId');
         openDatePicker(contactId, this); // Pass the clicked icon to position the date picker
     });
+
+    $('#btn-whatsapp').on('click', function () {
+        const selectedContacts = $('.contact-card .checkbox:checked')
+            .map(function () {
+                return $(this).closest('.contact-card').data('contactId');
+            })
+            .get();
+
+        if (selectedContacts.length !== 1) {
+            alert('Please select exactly one contact to send a WhatsApp message.');
+            return;
+        }
+
+        const contactId = selectedContacts[0];
+
+        // Fetch contact details
+        $.ajax({
+            url: `/pipeline/${contactId}/getdata`, // Replace with the route to fetch contact data
+            method: 'GET',
+            success: function (response) {
+                $('#from_whatsapp').val("{{ config('whatsapp.from') }}"); // Your WhatsApp sender number from the config
+                $('#to_whatsapp').val(response.tel2); // Client's WhatsApp number
+                $('#whatsapp_subject').val(""); // Optional, clear previous subject
+                $('#whatsapp_message').val(""); // Optional, clear previous message
+                $('#whatsappModal').modal('show');
+            },
+            error: function (xhr) {
+                alert('Failed to load contact details. Please try again.');
+            },
+        });
+    });
+
+    $('#whatsappForm').on('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        $.ajax({
+            url: '/pipeline/send-whatsapp', // Define the route to send WhatsApp messages
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                alert(response.message || 'Message sent successfully!');
+                $('#whatsappModal').modal('hide');
+            },
+            error: function (xhr) {
+                alert('Failed to send the WhatsApp message. Please try again.');
+            },
+        });
+    });
+
+
 
 });
 
