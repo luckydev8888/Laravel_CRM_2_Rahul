@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 class PipelineController extends Controller
 {
@@ -166,4 +167,42 @@ class PipelineController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Status updated successfully!']);
     }
+
+    public function sendEmail(Request $request){
+        // print_r("request");exit;
+        $request->validate([
+            'to_email' => 'required|email',  // Validate "To Email"
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string',
+            'attachment' => 'nullable|file|max:10240', // Max file size: 10MB
+        ]);
+
+        $emailData = [
+            'subject' => $request->subject,
+            'message' => $request->message,
+        ];
+
+        $filePath = $request->file('attachment')->getRealPath();
+        $fileName = $request->file('attachment')->getClientOriginalName();
+        $mime = $request->file('attachment')->getMimeType();
+
+        Mail::to($request->to_email)->send(new EmailWithAttachment($emailData, $filePath, $fileName, $mime));
+
+        // Mail::send([], [], function ($message) use ($request, $emailData) {
+        //     $message->from($request->from_email)
+        //         ->to($request->to_email)
+        //         ->subject($emailData['subject'])
+        //         ->setBody($emailData['message'], 'text/html');
+
+        //     if ($request->hasFile('attachment')) {
+        //         $message->attach($request->file('attachment')->getRealPath(), [
+        //             'as' => $request->file('attachment')->getClientOriginalName(),
+        //             'mime' => $request->file('attachment')->getMimeType(),
+        //         ]);
+        //     }
+        // });
+
+        return response()->json(['success' => true, 'message' => 'Email sent successfully!']);
+    }
+
 }

@@ -499,6 +499,49 @@
     </div>
 </div>
 
+<div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="emailModalLabel">Send Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="emailForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="from_email" class="form-label">From Email</label>
+                        <input type="email" class="form-control" id="from_email" name="from_email" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="to_email" class="form-label">To Email</label>
+                        <input type="email" class="form-control" id="to_email" name="to_email" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="attachment" class="form-label">Attachment (Optional)</label>
+                        <input type="file" class="form-control" id="attachment" name="attachment">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Send Email</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -696,6 +739,59 @@
             },
         });
     });
+
+    // Open email modal
+    $('#btn-email').on('click', function () {
+            const selectedContacts = $('.contact-card .checkbox:checked')
+                .map(function () {
+                    return $(this).closest('.contact-card').data('contactId');
+                })
+                .get();
+
+            if (selectedContacts.length !== 1) {
+                alert('Please select exactly one contact to send an email.');
+                return;
+            }
+
+            const contactId = selectedContacts[0];
+
+            // Fetch contact details
+            $.ajax({
+                url: `/pipeline/${contactId}/getdata`,
+                method: 'GET',
+                success: function (response) {
+                    $('#from_email').val("{{ config('mail.from.address') }}"); // From email from .env
+                    $('#to_email').val(response.email); // To email from client data
+                    $('#emailModal').modal('show');
+                },
+                error: function (xhr) {
+                    alert('Failed to load contact details. Please try again.');
+                },
+            });
+        });
+
+        // Handle email form submission
+        $('#emailForm').on('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            $.ajax({
+                url: '/pipeline/send-email',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    alert(response.message);
+                    $('#emailModal').modal('hide');
+                },
+                error: function (xhr) {
+                    alert('Failed to send email. Please try again.');
+                },
+            });
+        });
+
 });
 
 </script>
