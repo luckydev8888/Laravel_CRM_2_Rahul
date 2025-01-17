@@ -30,7 +30,7 @@
     </head>
     <!-- Fonts -->
 
-    <body id="kt_body" style="background-image: url(assets/media/logo_wallpaper.jpg); background-size:cover;" class="header-fixed header-tablet-and-mobile-fixed toolbar-enabled aside-enabled">
+    <body id="kt_body" style="background-image: url(assets/media/logo_wallpaper.jpg); background-size:auto;" class="header-fixed header-tablet-and-mobile-fixed toolbar-enabled aside-enabled">
         <!--begin::Main-->
         <!--begin::Root-->
         <div class="d-flex flex-column flex-root">

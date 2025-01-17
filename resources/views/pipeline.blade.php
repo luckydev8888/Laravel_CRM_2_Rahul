@@ -167,6 +167,11 @@
         margin-left: 30px;
     }
 
+    .search-box-group {
+        margin-left: -200px; /* Adjust the value for your desired position */
+    }
+
+
     .filter-section select,
     .filter-section input {
         padding: 5px;
@@ -229,7 +234,7 @@
                 @endforeach
             </select>
         </div>
-        <div class="filter-group">
+        <div class="filter-group search-box-group">
             <label for="search-box" class="filter-label">Search:</label>
             <input type="text" id="search-box" value="{{ $searchQuery }}" placeholder="Search..." class="filter-input">
         </div>
@@ -254,9 +259,7 @@
         @foreach ($statuses as $status => $contacts)
         <div class="status-column">
             <h5>
-                <label>
-                    <input type="radio" name="status-filter" value="{{ $status }}"> {{ $status }}
-                </label>
+                <label> {{ $status }}</label>
             </h5>
             @if ($contacts->isEmpty())
             <p style="text-align: center; color: #aaa;">No data available</p>
