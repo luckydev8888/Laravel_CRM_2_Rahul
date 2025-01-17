@@ -40,6 +40,8 @@ Route::get('/pipeline/{id}/getdata', [App\Http\Controllers\PipelineController::c
 Route::post('/pipeline/contact/edit', [App\Http\Controllers\PipelineController::class, 'edit'])->name('pipeline.contact.edit');
 Route::post('/pipeline/update-status', [App\Http\Controllers\PipelineController::class, 'updateStatus'])->name('pipeline.updateStatus');
 Route::post('/pipeline/send-email', [App\Http\Controllers\PipelineController::class, 'sendEmail'])->name('pipeline.sendEmail');
+Route::post('/pipeline/update-date', [App\Http\Controllers\PipelineController::class, 'updateDate'])->name('pipeline.updateDate');
+
 
 
 

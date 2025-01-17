@@ -205,4 +205,23 @@ class PipelineController extends Controller
         return response()->json(['success' => true, 'message' => 'Email sent successfully!']);
     }
 
+    public function updateDate(Request $request) {
+        $request->validate([
+            'contact_id' => 'required|exists:clients,id',
+            'date' => 'required|date',
+        ]);
+    
+        $contact = Client::find($request->contact_id);
+    
+        if (!$contact) {
+            return response()->json(['success' => false, 'message' => 'Contact not found.']);
+        }
+    
+        $contact->date = $request->date;
+        $contact->save();
+    
+        return response()->json(['success' => true, 'message' => 'Date updated successfully!']);
+    }
+    
+
 }

@@ -277,7 +277,12 @@
                     <p>{{ $contact->town }}</p>
                     <p>{{ $contact->area }}</p>
                     <p>#{{ $contact->id }}</p>
-                    <p>{{ $contact->formatted_date ?? 'N/A' }} <i class="fa-solid fa-calendar"></i></p>
+                    <p>
+                        {{ $contact->formatted_date ?? 'N/A' }} 
+                        <i class="fa-solid fa-calendar" 
+                        style="cursor: pointer;" 
+                        onclick="openDatePicker({{ $contact->id }})"></i>
+                    </p>
                 </div>
 
                 <!-- Edit Button -->
@@ -791,6 +796,73 @@
                 },
             });
         });
+
+         // Function to open the date picker when clicking the calendar icon
+    function openDatePicker(contactId, calendarIcon) {
+        // Create a temporary input element for the date picker
+        const input = document.createElement("input");
+        input.type = "text";
+        input.style.position = "absolute";
+        input.style.opacity = 0;
+
+        // Append the input to the body
+        document.body.appendChild(input);
+
+        // Get the position of the calendar icon
+        const iconOffset = $(calendarIcon).offset();
+
+        // Initialize the date picker at the position of the calendar icon
+        $(input).datepicker({
+            dateFormat: "yy-mm-dd",
+            onSelect: function (dateText) {
+                // Update the date via AJAX
+                updateContactDate(contactId, dateText);
+                $(this).datepicker("destroy");
+                document.body.removeChild(input);
+            },
+        });
+
+        // Position the input at the calendar icon's position
+        $(input).css({
+            top: iconOffset.top,
+            left: iconOffset.left,
+        });
+
+        $(input).datepicker("show");
+    }
+
+    // Function to send an AJAX request to update the contact date
+    function updateContactDate(contactId, selectedDate) {
+        $.ajax({
+            url: "/pipeline/update-date",
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
+            data: {
+                contact_id: contactId,
+                date: selectedDate,
+            },
+            success: function (response) {
+                if (response.success) {
+                    alert("Date updated successfully!");
+                    window.location.reload(); // Reload to reflect the updated date
+                } else {
+                    alert(response.message || "Failed to update the date.");
+                }
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+                alert("An error occurred while updating the date.");
+            },
+        });
+    }
+
+    // Attach the event listener to the calendar icons
+    $('.fa-calendar').on('click', function () {
+        const contactId = $(this).closest('.contact-card').data('contactId');
+        openDatePicker(contactId, this); // Pass the clicked icon to position the date picker
+    });
 
 });
 
