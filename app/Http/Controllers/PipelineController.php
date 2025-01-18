@@ -7,6 +7,8 @@ use App\Models\Client;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\EmailWithAttachment;
+
 
 class PipelineController extends Controller
 {

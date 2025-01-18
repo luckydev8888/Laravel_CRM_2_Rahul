@@ -3,13 +3,17 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
 class EmailWithAttachment extends Mailable
 {
     use Queueable, SerializesModels;
+
+    public $details; // Add this to hold email details
+    public $filePath;
+    public $fileName;
+    public $mime;
 
     /**
      * Create a new message instance.
@@ -31,8 +35,11 @@ class EmailWithAttachment extends Mailable
      */
     public function build()
     {
-        return $this->attach($this->filePath, [
-                        'as' => $this->fileName, // Optional: Rename the file
+        return $this->view('emails.attachment') // Specify the email view
+                    ->subject($this->details['subject']) // Use the subject from details
+                    ->with('details', $this->details) // Pass details to the view
+                    ->attach($this->filePath, [
+                        'as' => $this->fileName, // Rename the file
                         'mime' => $this->mime,  // Specify MIME type
                     ]);
     }
