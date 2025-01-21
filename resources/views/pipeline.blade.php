@@ -52,14 +52,22 @@
         padding: 10px;
         overflow-y: auto;
         max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        scrollbar-width: none; /* For Firefox */
+        -ms-overflow-style: none; /* For IE and Edge */
+    }
+
+    .status-column::-webkit-scrollbar {
+        display: none; /* For Chrome, Safari, and Opera */
     }
 
     .status-column h5 {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        background: #007bff;
-        color: white;
+        justify-content: center; /* Center horizontally */
+        text-align: center; /* Align text inside the header */
+        background: transparent !important;  /* Set background to none */
+        color: black !important; /* Ensure the text color is visible */
         padding: 10px;
         border-radius: 3px;
         margin: 0;
