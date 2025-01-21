@@ -273,7 +273,7 @@ class PipelineController extends Controller
         $value = $request->input('value');
 
         // Ensure the field is allowed for editing
-        $allowedFields = ['contact', 'company', 'tel1', 'tel2'];
+        $allowedFields = ['contact', 'company', 'tel1', 'tel2', 'town', 'area'];
         if (!in_array($field, $allowedFields)) {
             return response()->json(['success' => false, 'message' => 'Invalid field']);
         }
