@@ -210,18 +210,6 @@
         font-size: 12px;
     }
 
-    #confirmModal .modal-dialog {
-        display: flex;
-        align-items: center; /* Vertical centering */
-        justify-content: center; /* Horizontal centering */
-        min-height: 100vh; /* Ensure full screen centering */
-    }
-
-    #confirmModal .modal-content {
-        border-radius: 10px; /* Optional: Add rounded corners */
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Optional: Add shadow for better appearance */
-    }
-
 </style>
 @endsection
 
@@ -1008,8 +996,21 @@
             $input.focus(); // Focus on the input field
         });
 
+        let isButtonClick = false; // Flag to track button clicks
+
+        // Detect button clicks
+        $('.btn').on('mousedown', function () {
+            isButtonClick = true; // Set the flag to true when a button is clicked
+        });
         // Save changes on input blur or pressing Enter
         $(document).on('blur', '.contact-card input', function () {
+            const $input = $(this);
+            // Check if the blur event originated from the checkbox
+            const isCheckbox = $input.closest('.contact-card').find('.checkbox:focus').length > 0;
+            if (isCheckbox || isButtonClick) {
+                isButtonClick = false; // Reset the flag
+                return; // Exit if the checkbox or button is interacted with
+            }
             saveChanges($(this));
         });
 
