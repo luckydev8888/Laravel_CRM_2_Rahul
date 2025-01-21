@@ -139,14 +139,20 @@
         font-size: 16px; /* Adjust icon size to fit the circular button */
     }
 
-    .contact-card i {
+    .contact-card .fa-pen {
         margin-left: 5px;
         color: yellow;
     }
 
-    .contact-card .fa-whatsapp,
-    .contact-card .fa-calendar {
-        color: green; /* Set color for WhatsApp and Calendar icons to green */
+    .contact-card .fa-whatsapp {
+        font-size: 20px;
+        border-radius: 50%;
+        background-color: green;
+        color: white; /* Set color for WhatsApp and Calendar icons to green */
+    }
+
+    .contact-card .fa-calendar{
+        color:blue;
     }
 
     .contact-card #contact-id {
