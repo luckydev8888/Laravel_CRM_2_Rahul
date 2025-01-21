@@ -1055,12 +1055,12 @@
         }
 
         const statusColors = {
-            "No contact": "#ffebcd", // Blanched Almond
-            "Call 1": "#add8e6", // Light Blue
-            "Send Sample": "#90ee90", // Light Green
-            "Sample Testing": "#f08080", // Light Coral
-            "Standby": "#ffdab9", // Peach Puff
-            "Almost": "#d3d3d3" // Light Grey
+            "No contact": "#fffef9", // Blanched Almond
+            "Call 1": "#fefcea", // Light Blue
+            "Send Sample": "#e8f5f8", // Light Green
+            "Sample Testing": "#eaf1d8", // Light Coral
+            "Standby": "#f8f4ad", // Peach Puff
+            "Almost": "#fcf3f3" // Light Grey
         };
 
         $('.contact-card').each(function () {
