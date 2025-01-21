@@ -265,7 +265,7 @@
             <p style="text-align: center; color: #aaa;">No data available</p>
             @else
             @foreach ($contacts as $contact)
-            <div class="contact-card" data-contact-id="{{ $contact->id }}">
+            <div class="contact-card" data-contact-id="{{ $contact->id }}"  data-status="{{ $status }}">
                 <div class="checkbox-wrapper">
                     <input type="checkbox" class="checkbox">
                 </div>
@@ -1026,6 +1026,22 @@
                 },
             });
         }
+
+        const statusColors = {
+            "No contact": "#ffebcd", // Blanched Almond
+            "Call 1": "#add8e6", // Light Blue
+            "Send Sample": "#90ee90", // Light Green
+            "Sample Testing": "#f08080", // Light Coral
+            "Standby": "#ffdab9", // Peach Puff
+            "Almost": "#d3d3d3" // Light Grey
+        };
+
+        $('.contact-card').each(function () {
+            const status = $(this).data('status');
+            if (statusColors[status]) {
+                $(this).css('background-color', statusColors[status]);
+            }
+        });
 });
 
 </script>
