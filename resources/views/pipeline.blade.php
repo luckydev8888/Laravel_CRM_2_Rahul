@@ -12,7 +12,7 @@
     .pipeline-container {
         display: flex;
         overflow-x: auto;
-        gap: 15px;
+        gap: 2px;
         margin-top: 20px;
     }
 
@@ -47,9 +47,9 @@
         flex: 1;
         min-width: 280px;
         background-color: #f8f9fa;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        padding: 10px;
+        /* border: 1px solid #ddd; */
+        /* border-radius: 5px; */
+        padding: 5px;
         overflow-y: auto;
         max-height: calc(100vh - 120px);
         overflow-y: auto;
@@ -66,8 +66,8 @@
         align-items: center;
         justify-content: center; /* Center horizontally */
         text-align: center; /* Align text inside the header */
-        background: transparent !important;  /* Set background to none */
-        color: black !important; /* Ensure the text color is visible */
+        background: transparent;  /* Set background to none */
+        color: black; /* Ensure the text color is visible */
         padding: 10px;
         border-radius: 3px;
         margin: 0;
@@ -150,11 +150,11 @@
     }
 
     .contact-card #contact-id {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    font-size: 14px;
-    color: #555;
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        font-size: 14px;
+        color: #555;
     }
 
 
@@ -210,19 +210,16 @@
         font-size: 12px;
     }
 
-    .status-column h5 {
+    #confirmModal .modal-dialog {
         display: flex;
-        align-items: center;
-        justify-content: center; /* Center horizontally */
-        text-align: center; /* Align text inside the header */
-        background: #007bff;
-        color: white;
-        padding: 10px;
-        border-radius: 3px;
-        margin: 0;
-        position: sticky;
-        top: 0;
-        z-index: 10;
+        align-items: center; /* Vertical centering */
+        justify-content: center; /* Horizontal centering */
+        min-height: 100vh; /* Ensure full screen centering */
+    }
+
+    #confirmModal .modal-content {
+        border-radius: 10px; /* Optional: Add rounded corners */
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Optional: Add shadow for better appearance */
     }
 
 </style>
@@ -230,7 +227,7 @@
 
 @section('content')
 
-<div>
+<div style="background-color:#f8f9fa">
     <!-- Filter and Action Buttons -->
     <div class="filter-section">
         <div class="filter-group">
@@ -554,7 +551,6 @@
     </div>
 </div>
 
-
 <div class="modal fade" id="whatsappModal" tabindex="-1" aria-labelledby="whatsappModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -591,6 +587,25 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Are you sure?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>Are you sure you want to proceed?</p>
+                <div class="d-flex justify-content-center mt-4">
+                    <button id="confirmNo" class="btn btn-danger me-2" data-bs-dismiss="modal">NO</button>
+                    <button id="confirmYes" class="btn btn-success" data-bs-dismiss="modal">YES</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -699,36 +714,57 @@
             });
         };
 
-        // Handle "Move Left" and "Move Right" buttons
-        $('#btn-move-left').on('click', function () {
-            moveContacts('left');
+        let actionType = null; // Track which action is being confirmed
+        let selectedContacts = [];
+        let statusToUpdate = null;
+
+        // Event handler for Move buttons
+        $('#btn-move-left, #btn-move-right').on('click', function () {
+            actionType = $(this).attr('id'); // Determine which button was clicked
+            selectedContacts = getSelectedContacts();
+
+            if (selectedContacts.length === 0) {
+                alert('Please select at least one contact.');
+                return;
+            }
+
+            $('#confirmModal').modal('show'); // Show the confirmation modal
         });
 
-        $('#btn-move-right').on('click', function () {
-            moveContacts('right');
+        // Event handler for status buttons
+        $('.change-status').on('click', function () {
+            actionType = 'status-change';
+            statusToUpdate = $(this).data('status');
+            selectedContacts = getSelectedContacts();
+
+            if (selectedContacts.length === 0) {
+                alert('Please select at least one contact.');
+                return;
+            }
+
+            $('#confirmModal').modal('show'); // Show the confirmation modal
         });
 
-        function moveContacts(direction) {
-            const selectedContacts = $('.contact-card .checkbox:checked')
+        // Confirm button logic
+        $('#confirmYes').on('click', function () {
+            if (actionType === 'btn-move-left' || actionType === 'btn-move-right') {
+                moveContacts(actionType === 'btn-move-left' ? 'left' : 'right');
+            } else if (actionType === 'status-change') {
+                updateStatus(statusToUpdate);
+            }
+        });
+
+        function getSelectedContacts() {
+            return $('.contact-card .checkbox:checked')
                 .map(function () {
                     return $(this).closest('.contact-card').data('contactId');
                 })
                 .get();
+        }
 
-            if (selectedContacts.length === 0) {
-                alert('Please select at least one contact to move.');
-                return;
-            }
-
-            const confirmation = confirm(
-                `Are you sure you want to move the selected contacts?`
-            );
-            if (!confirmation) {
-                return; // Exit if the user cancels
-            }
-
+        function moveContacts(direction) {
             $.ajax({
-                url: '/pipeline/update', // Endpoint for updating the contact's status
+                url: '/pipeline/update',
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
@@ -738,37 +774,19 @@
                 success: function (response) {
                     if (response.success) {
                         alert('Contacts moved successfully!');
-                        window.location.reload(); // Reload the page to reflect updated statuses
+                        window.location.reload();
                     } else {
-                        alert(response.message);
+                        alert(response.message || 'Failed to move contacts.');
                     }
                 },
                 error: function (xhr) {
-                    console.error('Error:', xhr.responseText);
-                    alert('An error occurred while moving contacts. Check the console for details.');
+                    console.error(xhr.responseText);
+                    alert('An error occurred while moving contacts.');
                 },
             });
         }
 
-        $('.change-status').on('click', function () {
-            const status = $(this).data('status');
-            const selectedContacts = $('.contact-card .checkbox:checked')
-                .map(function () {
-                    return $(this).closest('.contact-card').data('contactId');
-                })
-                .get();
-
-            if (selectedContacts.length === 0) {
-                alert('Please select at least one contact to change the status.');
-                return;
-            }
-
-            const confirmation = confirm(`Are you sure you want to update the status to "${status}" for the selected contacts?`);
-            if (!confirmation) {
-                return; // Exit if the user cancels
-            }
-
-            // AJAX call to update the status
+        function updateStatus(status) {
             $.ajax({
                 url: '/pipeline/update-status',
                 method: 'POST',
@@ -780,17 +798,17 @@
                 success: function (response) {
                     if (response.success) {
                         alert('Status updated successfully!');
-                        window.location.reload(); // Reload the page to reflect updated statuses
+                        window.location.reload();
                     } else {
-                        alert(response.message);
+                        alert(response.message || 'Failed to update status.');
                     }
                 },
                 error: function (xhr) {
-                    console.error('Error:', xhr.responseText);
-                    alert('An error occurred while updating the status. Check the console for details.');
+                    console.error(xhr.responseText);
+                    alert('An error occurred while updating the status.');
                 },
             });
-        });
+        }
 
         // Open email modal
         $('#btn-email').on('click', function () {
