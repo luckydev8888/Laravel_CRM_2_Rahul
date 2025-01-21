@@ -8,6 +8,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\EmailWithAttachment;
+use App\Services\WhatsAppService;
 
 
 class PipelineController extends Controller
@@ -171,7 +172,6 @@ class PipelineController extends Controller
     }
 
     public function sendEmail(Request $request){
-        // print_r("request");exit;
         $request->validate([
             'to_email' => 'required|email',  // Validate "To Email"
             'subject' => 'required|string|max:255',
@@ -184,28 +184,29 @@ class PipelineController extends Controller
             'message' => $request->message,
         ];
 
-        $filePath = $request->file('attachment')->getRealPath();
-        $fileName = $request->file('attachment')->getClientOriginalName();
-        $mime = $request->file('attachment')->getMimeType();
+        // Initialize variables for file attachment
+        $filePath = null;
+        $fileName = null;
+        $mime = null;
 
-        Mail::to($request->to_email)->send(new EmailWithAttachment($emailData, $filePath, $fileName, $mime));
+        // Check if an attachment is provided
+        if ($request->hasFile('attachment')) {
+            $filePath = $request->file('attachment')->getRealPath();
+            $fileName = $request->file('attachment')->getClientOriginalName();
+            $mime = $request->file('attachment')->getMimeType();
+        }
 
-        // Mail::send([], [], function ($message) use ($request, $emailData) {
-        //     $message->from($request->from_email)
-        //         ->to($request->to_email)
-        //         ->subject($emailData['subject'])
-        //         ->setBody($emailData['message'], 'text/html');
+        try {
+            // Send the email with or without attachment
+            Mail::to($request->to_email)->send(new EmailWithAttachment($emailData, $filePath, $fileName, $mime));
 
-        //     if ($request->hasFile('attachment')) {
-        //         $message->attach($request->file('attachment')->getRealPath(), [
-        //             'as' => $request->file('attachment')->getClientOriginalName(),
-        //             'mime' => $request->file('attachment')->getMimeType(),
-        //         ]);
-        //     }
-        // });
-
-        return response()->json(['success' => true, 'message' => 'Email sent successfully!']);
+            return response()->json(['success' => true, 'message' => 'Email sent successfully!']);
+        } catch (\Exception $e) {
+            // Handle exceptions gracefully
+            return response()->json(['success' => false, 'message' => 'Failed to send email: ' . $e->getMessage()]);
+        }
     }
+
 
     public function updateDate(Request $request) {
         $request->validate([
@@ -225,25 +226,34 @@ class PipelineController extends Controller
         return response()->json(['success' => true, 'message' => 'Date updated successfully!']);
     }
 
+    private function formatPhoneNumber($number) {
+        // Remove all non-numeric characters except '+'
+        $number = preg_replace('/[^\d+]/', '', $number);
+    
+        // Add '+' if it doesn't exist
+        if (!str_starts_with($number, '+')) {
+            $number = '+' . $number;
+        }
+    
+        return $number;
+    }
+
     public function sendWhatsapp(Request $request) {
         $request->validate([
             'from_whatsapp' => 'required|string',
             'to_whatsapp' => 'required|string',
             'whatsapp_subject' => 'nullable|string|max:255',
             'whatsapp_message' => 'required|string',
-            'whatsapp_attachment' => 'nullable|file|max:10240', // Max file size: 10MB
+            'whatsapp_attachment' => 'nullable|file|max:10240',
         ]);
     
-        $fromWhatsapp = $request->input('from_whatsapp');
-        $toWhatsapp = $request->input('to_whatsapp');
-        $subject = $request->input('whatsapp_subject');
+        $fromWhatsapp = $this->formatPhoneNumber($request->input('from_whatsapp'));
+        $toWhatsapp = $this->formatPhoneNumber($request->input('to_whatsapp'));
         $message = $request->input('whatsapp_message');
         $attachment = $request->file('whatsapp_attachment');
     
-        // Use a WhatsApp API service (e.g., Twilio, Vonage) to send the message
-        $whatsappService = new WhatsAppService(); // Replace with your implementation
-    
-        $result = $whatsappService->sendMessage($fromWhatsapp, $toWhatsapp, $message, $subject, $attachment);
+        $whatsappService = new WhatsAppService();
+        $result = $whatsappService->sendMessage($fromWhatsapp, $toWhatsapp, $message, null, $attachment);
     
         if ($result['success']) {
             return response()->json(['success' => true, 'message' => 'WhatsApp message sent successfully!']);
@@ -251,7 +261,27 @@ class PipelineController extends Controller
             return response()->json(['success' => false, 'message' => $result['error'] ?? 'Failed to send message.']);
         }
     }
-    
-    
+
+    public function editInline(Request $request, $id){
+        $request->validate([
+            'field' => 'required|string',
+            'value' => 'nullable|string|max:255',
+        ]);
+
+        $contact = Client::findOrFail($id);
+        $field = $request->input('field');
+        $value = $request->input('value');
+
+        // Ensure the field is allowed for editing
+        $allowedFields = ['contact', 'company', 'tel1', 'tel2'];
+        if (!in_array($field, $allowedFields)) {
+            return response()->json(['success' => false, 'message' => 'Invalid field']);
+        }
+
+        $contact->$field = $value;
+        $contact->save();
+
+        return response()->json(['success' => true, 'message' => 'Field updated successfully']);
+    }
 
 }

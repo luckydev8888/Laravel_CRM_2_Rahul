@@ -239,7 +239,7 @@
             <input type="text" id="search-box" value="{{ $searchQuery }}" placeholder="Search..." class="filter-input">
         </div>
         <div class="action-buttons-container">
-            <button id="btn-whatsapp" class="btn btn-success"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+            <!-- <button id="btn-whatsapp" class="btn btn-success"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button> -->
             <button id="btn-email" class="btn btn-primary"><i class="fa-solid fa-envelope"></i> Email</button>
             <button id="btn-move-left" class="btn btn-warning"><i class="fa-solid fa-arrow-left"></i> Move</button>
             <button id="btn-move-right" class="btn btn-warning">Move <i class="fa-solid fa-arrow-right"></i></button>
@@ -266,19 +266,17 @@
             @else
             @foreach ($contacts as $contact)
             <div class="contact-card" data-contact-id="{{ $contact->id }}">
-                <!-- Checkbox -->
-                <div>
+                <div class="checkbox-wrapper">
                     <input type="checkbox" class="checkbox">
                 </div>
-                
 
                 <div class="row">
-                    <p>{{ $contact->contact }}</p>
-                    <p>{{ $contact->company }}</p>
-                    <p>{{ $contact->tel1 }} <i class="fa-brands fa-whatsapp"></i></p>
-                    <p>{{ $contact->tel2 }} <i class="fa-brands fa-whatsapp"></i></p>
-                    <p>{{ $contact->town }}</p>
-                    <p>{{ $contact->area }}</p>
+                    <p data-field="contact">{{ $contact->contact }}</p>
+                    <p data-field="company">{{ $contact->company }}</p>
+                    <p data-field="tel1">{{ $contact->tel1 }} <i class="fa-brands fa-whatsapp"></i></p>
+                    <p data-field="tel2">{{ $contact->tel2 }} <i class="fa-brands fa-whatsapp"></i></p>
+                    <p data-field="town">{{ $contact->town }}</p>
+                    <p data-field="area">{{ $contact->area }}</p>
                     <p>#{{ $contact->id }}</p>
                     <p>
                         {{ $contact->formatted_date ?? 'N/A' }} 
@@ -521,34 +519,33 @@
                         <label for="from_email" class="form-label">From Email</label>
                         <input type="email" class="form-control" id="from_email" name="from_email" readonly>
                     </div>
-
                     <div class="mb-3">
                         <label for="to_email" class="form-label">To Email</label>
                         <input type="email" class="form-control" id="to_email" name="to_email" readonly>
                     </div>
-
                     <div class="mb-3">
                         <label for="subject" class="form-label">Subject</label>
                         <input type="text" class="form-control" id="subject" name="subject" required>
                     </div>
-
                     <div class="mb-3">
                         <label for="message" class="form-label">Message</label>
                         <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
                     </div>
-
                     <div class="mb-3">
                         <label for="attachment" class="form-label">Attachment (Optional)</label>
                         <input type="file" class="form-control" id="attachment" name="attachment">
                     </div>
-
-                    <button type="submit" class="btn btn-primary">Send Email</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <!-- Button container -->
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Send Email</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
 
 <div class="modal fade" id="whatsappModal" tabindex="-1" aria-labelledby="whatsappModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -564,34 +561,29 @@
                         <label for="from_whatsapp" class="form-label">From WhatsApp Number</label>
                         <input type="text" class="form-control" id="from_whatsapp" name="from_whatsapp" readonly>
                     </div>
-
                     <div class="mb-3">
                         <label for="to_whatsapp" class="form-label">To WhatsApp Number</label>
                         <input type="text" class="form-control" id="to_whatsapp" name="to_whatsapp" readonly>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="whatsapp_subject" class="form-label">Subject</label>
-                        <input type="text" class="form-control" id="whatsapp_subject" name="whatsapp_subject" required>
-                    </div>
-
                     <div class="mb-3">
                         <label for="whatsapp_message" class="form-label">Message</label>
                         <textarea class="form-control" id="whatsapp_message" name="whatsapp_message" rows="5" required></textarea>
                     </div>
-
                     <div class="mb-3">
                         <label for="whatsapp_attachment" class="form-label">Attachment (Optional)</label>
                         <input type="file" class="form-control" id="whatsapp_attachment" name="whatsapp_attachment">
                     </div>
-
-                    <button type="submit" class="btn btn-primary">Send Message</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <!-- Button container -->
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
 
 
 
@@ -666,134 +658,134 @@
 
         // Function to open and populate the edit modal
         window.editContact = function (contactId) {
-        // Fetch contact details using the PipelineController route
-        $.ajax({
-            url: `/pipeline/${contactId}/getdata`, // Route defined in web.php
-            method: 'GET',
-            success: function (response) {
-                // Populate modal fields with contact data
-                $('#edit_id').val(response.id);
-                $('#edit_contact').val(response.contact);
-                $('#edit_country').val(response.country);
-                $('#edit_assigned').val(response.assigned);
-                $('#edit_status').val(response.status);
-                $('#edit_date').val(response.date);
-                $('#edit_company').val(response.company);
-                $('#edit_tel1').val(response.tel1);
-                $('#edit_tel2').val(response.tel2);
-                $('#edit_town').val(response.town);
-                $('#edit_email').val(response.email);
-                $('#edit_area').val(response.area);
-                $('#edit_brand').val(response.brand);
-                $('#edit_score').val(response.score);
-                $('#edit_samples').val(response.samples);
-                $('#edit_comments').val(response.comments);
+            // Fetch contact details using the PipelineController route
+            $.ajax({
+                url: `/pipeline/${contactId}/getdata`, // Route defined in web.php
+                method: 'GET',
+                success: function (response) {
+                    // Populate modal fields with contact data
+                    $('#edit_id').val(response.id);
+                    $('#edit_contact').val(response.contact);
+                    $('#edit_country').val(response.country);
+                    $('#edit_assigned').val(response.assigned);
+                    $('#edit_status').val(response.status);
+                    $('#edit_date').val(response.date);
+                    $('#edit_company').val(response.company);
+                    $('#edit_tel1').val(response.tel1);
+                    $('#edit_tel2').val(response.tel2);
+                    $('#edit_town').val(response.town);
+                    $('#edit_email').val(response.email);
+                    $('#edit_area').val(response.area);
+                    $('#edit_brand').val(response.brand);
+                    $('#edit_score').val(response.score);
+                    $('#edit_samples').val(response.samples);
+                    $('#edit_comments').val(response.comments);
 
-                // Open the modal
-                $('#edit_contacts').modal('show');
-            },
-            error: function (xhr) {
-                console.error('Error fetching contact details:', xhr.responseText);
-                alert('Failed to load contact details.');
-            },
+                    // Open the modal
+                    $('#edit_contacts').modal('show');
+                },
+                error: function (xhr) {
+                    console.error('Error fetching contact details:', xhr.responseText);
+                    alert('Failed to load contact details.');
+                },
+            });
+        };
+
+        // Handle "Move Left" and "Move Right" buttons
+        $('#btn-move-left').on('click', function () {
+            moveContacts('left');
         });
-    };
 
-     // Handle "Move Left" and "Move Right" buttons
-     $('#btn-move-left').on('click', function () {
-        moveContacts('left');
-    });
-
-    $('#btn-move-right').on('click', function () {
-        moveContacts('right');
-    });
-
-    function moveContacts(direction) {
-        const selectedContacts = $('.contact-card .checkbox:checked')
-            .map(function () {
-                return $(this).closest('.contact-card').data('contactId');
-            })
-            .get();
-
-        if (selectedContacts.length === 0) {
-            alert('Please select at least one contact to move.');
-            return;
-        }
-
-        const confirmation = confirm(
-            `Are you sure you want to move the selected contacts?`
-        );
-        if (!confirmation) {
-            return; // Exit if the user cancels
-        }
-
-        $.ajax({
-            url: '/pipeline/update', // Endpoint for updating the contact's status
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-            },
-            contentType: 'application/json',
-            data: JSON.stringify({ contact_ids: selectedContacts, direction }),
-            success: function (response) {
-                if (response.success) {
-                    alert('Contacts moved successfully!');
-                    window.location.reload(); // Reload the page to reflect updated statuses
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function (xhr) {
-                console.error('Error:', xhr.responseText);
-                alert('An error occurred while moving contacts. Check the console for details.');
-            },
+        $('#btn-move-right').on('click', function () {
+            moveContacts('right');
         });
-    }
 
-    $('.change-status').on('click', function () {
-        const status = $(this).data('status');
-        const selectedContacts = $('.contact-card .checkbox:checked')
-            .map(function () {
-                return $(this).closest('.contact-card').data('contactId');
-            })
-            .get();
+        function moveContacts(direction) {
+            const selectedContacts = $('.contact-card .checkbox:checked')
+                .map(function () {
+                    return $(this).closest('.contact-card').data('contactId');
+                })
+                .get();
 
-        if (selectedContacts.length === 0) {
-            alert('Please select at least one contact to change the status.');
-            return;
+            if (selectedContacts.length === 0) {
+                alert('Please select at least one contact to move.');
+                return;
+            }
+
+            const confirmation = confirm(
+                `Are you sure you want to move the selected contacts?`
+            );
+            if (!confirmation) {
+                return; // Exit if the user cancels
+            }
+
+            $.ajax({
+                url: '/pipeline/update', // Endpoint for updating the contact's status
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                },
+                contentType: 'application/json',
+                data: JSON.stringify({ contact_ids: selectedContacts, direction }),
+                success: function (response) {
+                    if (response.success) {
+                        alert('Contacts moved successfully!');
+                        window.location.reload(); // Reload the page to reflect updated statuses
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    console.error('Error:', xhr.responseText);
+                    alert('An error occurred while moving contacts. Check the console for details.');
+                },
+            });
         }
 
-        const confirmation = confirm(`Are you sure you want to update the status to "${status}" for the selected contacts?`);
-        if (!confirmation) {
-            return; // Exit if the user cancels
-        }
+        $('.change-status').on('click', function () {
+            const status = $(this).data('status');
+            const selectedContacts = $('.contact-card .checkbox:checked')
+                .map(function () {
+                    return $(this).closest('.contact-card').data('contactId');
+                })
+                .get();
 
-        // AJAX call to update the status
-        $.ajax({
-            url: '/pipeline/update-status',
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-            },
-            contentType: 'application/json',
-            data: JSON.stringify({ contact_ids: selectedContacts, status }),
-            success: function (response) {
-                if (response.success) {
-                    alert('Status updated successfully!');
-                    window.location.reload(); // Reload the page to reflect updated statuses
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function (xhr) {
-                console.error('Error:', xhr.responseText);
-                alert('An error occurred while updating the status. Check the console for details.');
-            },
+            if (selectedContacts.length === 0) {
+                alert('Please select at least one contact to change the status.');
+                return;
+            }
+
+            const confirmation = confirm(`Are you sure you want to update the status to "${status}" for the selected contacts?`);
+            if (!confirmation) {
+                return; // Exit if the user cancels
+            }
+
+            // AJAX call to update the status
+            $.ajax({
+                url: '/pipeline/update-status',
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                },
+                contentType: 'application/json',
+                data: JSON.stringify({ contact_ids: selectedContacts, status }),
+                success: function (response) {
+                    if (response.success) {
+                        alert('Status updated successfully!');
+                        window.location.reload(); // Reload the page to reflect updated statuses
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    console.error('Error:', xhr.responseText);
+                    alert('An error occurred while updating the status. Check the console for details.');
+                },
+            });
         });
-    });
 
-    // Open email modal
-    $('#btn-email').on('click', function () {
+        // Open email modal
+        $('#btn-email').on('click', function () {
             const selectedContacts = $('.contact-card .checkbox:checked')
                 .map(function () {
                     return $(this).closest('.contact-card').data('contactId');
@@ -845,126 +837,195 @@
         });
 
          // Function to open the date picker when clicking the calendar icon
-    function openDatePicker(contactId, calendarIcon) {
-        // Create a temporary input element for the date picker
-        const input = document.createElement("input");
-        input.type = "text";
-        input.style.position = "absolute";
-        input.style.opacity = 0;
+        function openDatePicker(contactId, calendarIcon) {
+            // Create a temporary input element for the date picker
+            const input = document.createElement("input");
+            input.type = "text";
+            input.style.position = "absolute";
+            input.style.opacity = 0;
 
-        // Append the input to the body
-        document.body.appendChild(input);
+            // Append the input to the body
+            document.body.appendChild(input);
 
-        // Get the position of the calendar icon
-        const iconOffset = $(calendarIcon).offset();
+            // Get the position of the calendar icon
+            const iconOffset = $(calendarIcon).offset();
 
-        // Initialize the date picker at the position of the calendar icon
-        $(input).datepicker({
-            dateFormat: "yy-mm-dd",
-            onSelect: function (dateText) {
-                // Update the date via AJAX
-                updateContactDate(contactId, dateText);
-                $(this).datepicker("destroy");
-                document.body.removeChild(input);
-            },
-        });
+            // Initialize the date picker at the position of the calendar icon
+            $(input).datepicker({
+                dateFormat: "yy-mm-dd",
+                onSelect: function (dateText) {
+                    // Update the date via AJAX
+                    updateContactDate(contactId, dateText);
+                    $(this).datepicker("destroy");
+                    document.body.removeChild(input);
+                },
+            });
 
-        // Position the input at the calendar icon's position
-        $(input).css({
-            top: iconOffset.top,
-            left: iconOffset.left,
-        });
+            // Position the input at the calendar icon's position
+            $(input).css({
+                top: iconOffset.top,
+                left: iconOffset.left,
+            });
 
-        $(input).datepicker("show");
-    }
-
-    // Function to send an AJAX request to update the contact date
-    function updateContactDate(contactId, selectedDate) {
-        $.ajax({
-            url: "/pipeline/update-date",
-            method: "POST",
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-            },
-            data: {
-                contact_id: contactId,
-                date: selectedDate,
-            },
-            success: function (response) {
-                if (response.success) {
-                    alert("Date updated successfully!");
-                    window.location.reload(); // Reload to reflect the updated date
-                } else {
-                    alert(response.message || "Failed to update the date.");
-                }
-            },
-            error: function (xhr) {
-                console.error(xhr.responseText);
-                alert("An error occurred while updating the date.");
-            },
-        });
-    }
-
-    // Attach the event listener to the calendar icons
-    $('.fa-calendar').on('click', function () {
-        const contactId = $(this).closest('.contact-card').data('contactId');
-        openDatePicker(contactId, this); // Pass the clicked icon to position the date picker
-    });
-
-    $('#btn-whatsapp').on('click', function () {
-        const selectedContacts = $('.contact-card .checkbox:checked')
-            .map(function () {
-                return $(this).closest('.contact-card').data('contactId');
-            })
-            .get();
-
-        if (selectedContacts.length !== 1) {
-            alert('Please select exactly one contact to send a WhatsApp message.');
-            return;
+            $(input).datepicker("show");
         }
 
-        const contactId = selectedContacts[0];
+        // Function to send an AJAX request to update the contact date
+        function updateContactDate(contactId, selectedDate) {
+            $.ajax({
+                url: "/pipeline/update-date",
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                data: {
+                    contact_id: contactId,
+                    date: selectedDate,
+                },
+                success: function (response) {
+                    if (response.success) {
+                        alert("Date updated successfully!");
+                        window.location.reload(); // Reload to reflect the updated date
+                    } else {
+                        alert(response.message || "Failed to update the date.");
+                    }
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                    alert("An error occurred while updating the date.");
+                },
+            });
+        }
 
-        // Fetch contact details
-        $.ajax({
-            url: `/pipeline/${contactId}/getdata`, // Replace with the route to fetch contact data
-            method: 'GET',
-            success: function (response) {
-                $('#from_whatsapp').val("{{ config('whatsapp.from') }}"); // Your WhatsApp sender number from the config
-                $('#to_whatsapp').val(response.tel2); // Client's WhatsApp number
-                $('#whatsapp_subject').val(""); // Optional, clear previous subject
-                $('#whatsapp_message').val(""); // Optional, clear previous message
-                $('#whatsappModal').modal('show');
-            },
-            error: function (xhr) {
-                alert('Failed to load contact details. Please try again.');
-            },
+        // Attach the event listener to the calendar icons
+        $('.fa-calendar').on('click', function () {
+            const contactId = $(this).closest('.contact-card').data('contactId');
+            openDatePicker(contactId, this); // Pass the clicked icon to position the date picker
         });
-    });
 
-    $('#whatsappForm').on('submit', function (e) {
-        e.preventDefault();
+        $('#btn-whatsapp').on('click', function () {
+            const selectedContacts = $('.contact-card .checkbox:checked')
+                .map(function () {
+                    return $(this).closest('.contact-card').data('contactId');
+                })
+                .get();
 
-        const formData = new FormData(this);
+            if (selectedContacts.length !== 1) {
+                alert('Please select exactly one contact to send a WhatsApp message.');
+                return;
+            }
 
-        $.ajax({
-            url: '/pipeline/send-whatsapp', // Define the route to send WhatsApp messages
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                alert(response.message || 'Message sent successfully!');
-                $('#whatsappModal').modal('hide');
-            },
-            error: function (xhr) {
-                alert('Failed to send the WhatsApp message. Please try again.');
-            },
+            const contactId = selectedContacts[0];
+
+            // Fetch contact details
+            $.ajax({
+                url: `/pipeline/${contactId}/getdata`, // Replace with the route to fetch contact data
+                method: 'GET',
+                success: function (response) {
+                    // $('#from_whatsapp').val("{{ config('whatsapp.from') }}"); // Your WhatsApp sender number from the config
+                    const fromWhatsApp = "{{ config('services.twilio.whatsapp_from') }}"; // Directly use Blade to get the value
+                    $('#from_whatsapp').val(fromWhatsApp); // Set the value in the modal
+                    $('#to_whatsapp').val(response.tel2); // Client's WhatsApp number
+                    // $('#whatsapp_subject').val(""); // Optional, clear previous subject
+                    $('#whatsapp_message').val(""); // Optional, clear previous message
+                    $('#whatsappModal').modal('show');
+                },
+                error: function (xhr) {
+                    alert('Failed to load contact details. Please try again.');
+                },
+            });
         });
-    });
 
+        $('#whatsappForm').on('submit', function (e) {
+            e.preventDefault();
 
+            const formData = new FormData(this);
 
+            $.ajax({
+                url: '/pipeline/send-whatsapp', // Define the route to send WhatsApp messages
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    alert(response.message || 'Message sent successfully!');
+                    $('#whatsappModal').modal('hide');
+                },
+                error: function (xhr) {
+                    alert('Failed to send the WhatsApp message. Please try again.');
+                },
+            });
+        });
+
+        let originalContent = ''; // Store the original content for restoration
+
+        // Enable inline editing for contact-card fields
+        $('.contact-card').on('click', 'p', function (e) {
+            e.stopPropagation();
+
+            const $this = $(this);
+            const contactId = $this.closest('.contact-card').data('contact-id');
+            const fieldName = $this.data('field'); // Use `data-field` for identifying the field
+
+            if (!fieldName || $this.find('input').length) return; // Prevent nested editing
+
+            originalContent = $this.text().trim();
+            const $input = $(`<input type="text" class="form-control" />`)
+                .val(originalContent)
+                .data('field', fieldName)
+                .data('contact-id', contactId)
+                .on('keypress', function (e) {
+                    if (e.which === 13) saveChanges($(this)); // Save on Enter
+                });
+
+            $this.html($input); // Replace the content with input
+            $input.focus(); // Focus on the input field
+        });
+
+        // Save changes on input blur or pressing Enter
+        $(document).on('blur', '.contact-card input', function () {
+            saveChanges($(this));
+        });
+
+        // Function to save changes via AJAX
+        function saveChanges($input) {
+            const newValue = $input.val().trim();
+            const fieldName = $input.data('field');
+            const contactId = $input.data('contact-id');
+            const $parent = $input.closest('p');
+
+            if (newValue === originalContent) {
+                // Restore original content if unchanged
+                $parent.text(originalContent);
+                return;
+            }
+
+            $.ajax({
+                url: `/pipeline/contact/${contactId}/edit-inline`, // Define route in the controller
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                },
+                data: {
+                    field: fieldName,
+                    value: newValue,
+                },
+                success: function (response) {
+                    if (response.success) {
+                        $parent.text(newValue); // Update content
+                        location.reload(); // Reload to reflect updated data
+                    } else {
+                        alert('Failed to save changes. Please try again.');
+                        $parent.text(originalContent); // Revert on failure
+                    }
+                },
+                error: function (xhr) {
+                    console.error('Error:', xhr.responseText);
+                    alert('An error occurred while saving. Please try again.');
+                    $parent.text(originalContent); // Revert on failure
+                },
+            });
+        }
 });
 
 </script>

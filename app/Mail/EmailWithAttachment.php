@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
@@ -20,7 +19,7 @@ class EmailWithAttachment extends Mailable
      *
      * @return void
      */
-    public function __construct($details, $filePath, $fileName, $mime)
+    public function __construct($details, $filePath = null, $fileName = null, $mime = null)
     {
         $this->details = $details;
         $this->filePath = $filePath;
@@ -35,12 +34,18 @@ class EmailWithAttachment extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.attachment') // Specify the email view
-                    ->subject($this->details['subject']) // Use the subject from details
-                    ->with('details', $this->details) // Pass details to the view
-                    ->attach($this->filePath, [
-                        'as' => $this->fileName, // Rename the file
-                        'mime' => $this->mime,  // Specify MIME type
-                    ]);
+        $email = $this->view('emails.attachment') // Specify the email view
+                     ->subject($this->details['subject']) // Use the subject from details
+                     ->with('details', $this->details); // Pass details to the view
+
+        // Attach the file only if it exists
+        if ($this->filePath) {
+            $email->attach($this->filePath, [
+                'as' => $this->fileName, // Rename the file
+                'mime' => $this->mime,  // Specify MIME type
+            ]);
+        }
+
+        return $email;
     }
 }

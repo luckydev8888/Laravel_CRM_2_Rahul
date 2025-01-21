@@ -19,11 +19,7 @@
         background-color: #ffed00;
     }
 
-    .Call2 {
-        background-color: #ffde0e;
-    }
-
-    .Call3 {
+    .Standby {
         background-color: #eeca13;
     }
     .Almost {
@@ -798,8 +794,8 @@ $(document).ready(function () {
                     return '<div class=\'Nocontact\'>' + val + '</div>'
                 } else if (status == 'call 1') {
                     return '<div class=\'Call1\'>' + val + '</div>'
-                } else if (status == 'call 2') {
-                    return '<div class=\'Call2\'>' + val + '</div>'
+                } else if (status == 'standby') {
+                    return '<div class=\'Standby\'>' + val + '</div>'
                 } else if (status == 'call 3') {
                     return '<div class=\'Call3\'>' + val + '</div>'
                 } else if (status == 'almost') {
