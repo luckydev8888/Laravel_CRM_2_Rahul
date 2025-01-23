@@ -160,7 +160,7 @@
                             <!--begin::Menu-->
                             <ul class="menu menu-gray-600 menu-hover-primary fw-bold order-1">
                                 <li class="menu-item">
-                                    <a target="_blank" class="menu-link px-2">Version 2.0</a>
+                                    <a target="_blank" class="menu-link px-2">Version 3.0</a>
                                 </li>
                             </ul>
                             <!--end::Menu-->

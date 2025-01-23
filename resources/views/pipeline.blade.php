@@ -978,7 +978,12 @@
         });
 
         let originalContent = ''; // Store the original content for restoration
-
+        
+        // Detect button clicks
+        let isButtonClick = false; // Flag to track button clicks
+        $('.btn').on('mousedown', function () {
+            isButtonClick = true; // Set the flag to true when a button is clicked
+        });
         // Enable inline editing for contact-card fields
         $('.contact-card').on('click', 'p', function (e) {
             e.stopPropagation();
@@ -1002,12 +1007,7 @@
             $input.focus(); // Focus on the input field
         });
 
-        let isButtonClick = false; // Flag to track button clicks
 
-        // Detect button clicks
-        $('.btn').on('mousedown', function () {
-            isButtonClick = true; // Set the flag to true when a button is clicked
-        });
         // Save changes on input blur or pressing Enter
         $(document).on('blur', '.contact-card input', function () {
             const $input = $(this);
