@@ -2,9 +2,10 @@
 
 @section('custom_styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.min.css"/>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
 
 
 
@@ -45,7 +46,7 @@
 
     .status-column {
         flex: 1;
-        min-width: 280px;
+        min-width: 300px;
         background-color: #f8f9fa;
         /* border: 1px solid #ddd; */
         /* border-radius: 5px; */
@@ -86,7 +87,7 @@
         display: flex;
         flex-wrap: wrap;
         width: 100%; /* Ensure the card takes up the full width of the container */
-        height: 250px; /* Set a fixed height for uniformity */
+        height: 200px; /* Set a fixed height for uniformity */
         box-sizing: border-box; /* Include padding and border in the dimensions */
         position: relative; /* For positioning child elements like checkbox and edit button */
     }
@@ -108,7 +109,7 @@
 
     .contact-card p {
         margin: 0; /* Remove unnecessary margin */
-        word-wrap: break-word; /* Handle long text gracefully */
+        /* word-wrap: break-word; Handle long text gracefully */
     }
 
     .contact-card i {
@@ -144,11 +145,21 @@
         color: yellow;
     }
 
-    .contact-card .fa-whatsapp {
-        font-size: 20px;
-        border-radius: 50%;
-        background-color: green;
-        color: white; /* Set color for WhatsApp and Calendar icons to green */
+    .contact-card .fa-phone-volume {
+        position: absolute; /* Position relative to the parent container */
+        bottom: 0; /* Align to the bottom */
+        right: 0; /* Align to the right */
+        font-size: 14px; /* Adjust icon size */
+        background-color: #28a745; /* Green background for icon */
+        color: white; /* White icon color */
+        width: 20px; /* Circle size */
+        height: 20px; /* Circle size */
+        border-radius: 50%; /* Make it circular */
+        display: flex; /* Center the icon inside */
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional shadow */
+        cursor: pointer; /* Make it interactive */
     }
 
     .contact-card .fa-calendar{
@@ -216,6 +227,26 @@
         font-size: 12px;
     }
 
+    
+
+    /* General styling for other fields */
+    .contact-card p {
+        overflow: hidden;
+        white-space: nowrap; /* Prevent wrapping */
+        text-overflow: ellipsis; /* Show "..." for truncated text */
+        word-break: break-word; /* Handle long words */
+    }
+
+    /* Specific styling for phone numbers (tel1 and tel2) */
+    .contact-card p[data-field="tel1"],
+    .contact-card p[data-field="tel2"] {
+        position: relative; /* Set parent container to relative */
+        padding-right: 20px; /* Add space for the icon on the right */
+        white-space: normal; /* Allow wrapping if necessary */
+        word-break: break-word; /* Break long phone numbers if needed */
+        font-size: 14px; /* Ensure consistent font size */
+    }
+
 </style>
 @endsection
 
@@ -270,16 +301,54 @@
                 </div>
 
                 <div class="row">
-                    <p data-field="contact">{{ $contact->contact }}</p>
-                    <p data-field="company">{{ $contact->company }}</p>
-                    <p data-field="tel1">{{ $contact->tel1 }} <i class="fa-brands fa-whatsapp"></i></p>
-                    <p data-field="tel2">{{ $contact->tel2 }} <i class="fa-brands fa-whatsapp"></i></p>
-                    <p data-field="town">{{ $contact->town }}</p>
-                    <p data-field="area">{{ $contact->area }}</p>
+                    <p data-field="contact">
+                        @if (!empty($contact->contact))
+                            {{ $contact->contact }}
+                        @else
+                            No contact info
+                        @endif
+                    </p>
+                    <p data-field="company">
+                        @if (!empty($contact->company))
+                            {{ $contact->company }}
+                        @else
+                            No company
+                        @endif
+                    </p>
+                    <p data-field="tel1">
+                        @if (!empty($contact->tel1))
+                            {{ $contact->tel1 }}
+                            <i class="fa-solid fa-phone-volume"></i>
+                        @else
+                            No phone number
+                        @endif
+                    </p>
+                    <p data-field="tel2">
+                        @if (!empty($contact->tel2))
+                            {{ $contact->tel2 }}
+                            <i class="fa-solid fa-phone-volume"></i>
+                        @else
+                            No phone number
+                        @endif
+                    </p>
+                    <p data-field="town">
+                        @if (!empty($contact->town))
+                            {{ $contact->town }}
+                        @else
+                            No town
+                        @endif
+                    </p>
+                    <p data-field="area">
+                        @if (!empty($contact->area))
+                            {{ $contact->area }}
+                        @else
+                            No area
+                        @endif
+                    </p>
                     <p>#{{ $contact->id }}</p>
                     <p>
                         {{ $contact->formatted_date ?? 'N/A' }} 
-                        <i class="fa-solid fa-calendar" 
+                        <i class="fa fa-calendar calendar-icon" 
                         style="cursor: pointer;" 
                         onclick="openDatePicker({{ $contact->id }})"></i>
                     </p>
