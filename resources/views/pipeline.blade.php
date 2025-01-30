@@ -87,7 +87,7 @@
         display: flex;
         flex-wrap: wrap;
         width: 100%; /* Ensure the card takes up the full width of the container */
-        height: 200px; /* Set a fixed height for uniformity */
+        height: 150px; /* Set a fixed height for uniformity */
         box-sizing: border-box; /* Include padding and border in the dimensions */
         position: relative; /* For positioning child elements like checkbox and edit button */
     }
@@ -296,8 +296,14 @@
             @else
             @foreach ($contacts as $contact)
             <div class="contact-card" data-contact-id="{{ $contact->id }}"  data-status="{{ $status }}">
-                <div class="checkbox-wrapper">
-                    <input type="checkbox" class="checkbox">
+                <div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" class="checkbox">
+                    </div>
+                    <!-- Edit Button -->
+                    <button class="edit-button" onclick="editContact({{ $contact->id }})">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
                 </div>
 
                 <div class="row">
@@ -345,7 +351,7 @@
                             No area
                         @endif
                     </p>
-                    <p>#{{ $contact->id }}</p>
+                    <p style="text-align:right;">#{{ $contact->id }}</p>
                     <p>
                         {{ $contact->formatted_date ?? 'N/A' }} 
                         <i class="fa fa-calendar calendar-icon" 
@@ -354,10 +360,6 @@
                     </p>
                 </div>
 
-                <!-- Edit Button -->
-                <button class="edit-button" onclick="editContact({{ $contact->id }})">
-                    <i class="fa-solid fa-pen"></i>
-                </button>
             </div>
 
             @endforeach
