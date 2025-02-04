@@ -122,6 +122,11 @@
                     <option value="CANARIAS" {{ Auth::user()->country == 'CANARIAS' ? 'selected' : ''}}>CANARIAS</option>
                     <option value="" {{ Auth::user()->is_admin ? 'selected' : '' }}>ALL</option>
                 </select>
+                <form action="{{ url('/contacts/import-excel') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="file" name="file" required>
+                    <button type="submit" class="btn btn-primary">Upload Excel</button>
+                </form>
             </div>
             <table id="contacts" class="display" style="width: 1900px;">
                 <thead>

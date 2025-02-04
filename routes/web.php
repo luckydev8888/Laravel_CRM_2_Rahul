@@ -32,6 +32,7 @@ Route::get('/contacts/whatsapp', [App\Http\Controllers\ClientController::class, 
 Route::post('/contacts/check-phone', [App\Http\Controllers\ClientController::class, 'checkPhone']);
 Route::post('/contacts/update-date', [App\Http\Controllers\ClientController::class, 'updateDate']);
 Route::post('/contacts/update-sample', [App\Http\Controllers\ClientController::class, 'updateSample']);
+Route::post('/contacts/import-excel', [App\Http\Controllers\ClientController::class, 'importExcel']);
 
 
 Route::get('/pipeline', [App\Http\Controllers\PipelineController::class, 'index'])->name('pipeline');

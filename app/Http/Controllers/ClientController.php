@@ -3,16 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Client;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Validator;
 use App\Models\User;
+use Carbon\Carbon;
+use App\Imports\ClientImport;
+
 
 class ClientController extends Controller
 {
     //
-    public function __construct()
-    {
+    public function __construct(){
         $this->middleware('auth');
     }
 
@@ -250,6 +254,18 @@ class ClientController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Sample date updated successfully']);
     }
+    
+    // Modify import function in ClientController
+    public function importExcel(Request $request) {
+        set_time_limit(600); // ✅ Increase script execution time
 
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        Excel::import(new ClientImport, $request->file('file'));
+
+        return redirect('/contacts')->with('success', 'Excel data imported successfully. Existing IDs were ignored.');
+    }
 
 }
