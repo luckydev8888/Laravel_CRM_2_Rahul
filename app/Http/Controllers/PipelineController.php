@@ -21,26 +21,42 @@ class PipelineController extends Controller
     public function index(Request $request){
         // Define default statuses
         $defaultStatuses = ['No contact', 'Call 1', 'Send Sample', 'Sample Testing', 'Standby', 'Almost'];
-
+    
         // Fetch clients grouped by status
         $clients = Client::whereIn('status', $defaultStatuses)->get();
-
+    
         // Format the date for each client
         $clients->each(function ($client) {
             $client->formatted_date = $client->date ? Carbon::parse($client->date)->format('d M Y') : null;
         });
-
-        // Group clients by their status and ensure keys match $defaultStatuses
+    
+        // Group clients by their status
         $statuses = collect($defaultStatuses)
             ->mapWithKeys(function ($status) use ($clients) {
                 return [$status => $clients->where('status', $status)];
             });
-
-        // Filter by city and search if applicable
+    
+        // Fetch distinct countries and cities
+        $countries = Client::distinct()->pluck('country');
         $cities = Client::distinct()->pluck('town');
+        $areas = Client::distinct()->pluck('area');
+    
+        // Get filter values from request
+        $selectedCountry = $request->get('country', '');
         $selectedCity = $request->get('city', '');
+        $selectedArea = $request->get('area', '');
         $searchQuery = $request->get('search', '');
-
+    
+        // Apply country filter
+        if ($selectedCountry) {
+            $statuses = $statuses->map(function ($contacts) use ($selectedCountry) {
+                return $contacts->filter(function ($contact) use ($selectedCountry) {
+                    return $contact->country === $selectedCountry;
+                });
+            });
+        }
+    
+        // Apply city filter
         if ($selectedCity) {
             $statuses = $statuses->map(function ($contacts) use ($selectedCity) {
                 return $contacts->filter(function ($contact) use ($selectedCity) {
@@ -49,6 +65,17 @@ class PipelineController extends Controller
             });
         }
 
+        // Apply area filter
+        if ($selectedArea) {
+            $statuses = $statuses->map(function ($contacts) use ($selectedArea) {
+                return $contacts->filter(function ($contact) use ($selectedArea) {
+                    return $contact->area === $selectedArea;
+                });
+            });
+        }
+
+    
+        // Apply search filter
         if ($searchQuery) {
             $statuses = $statuses->map(function ($contacts) use ($searchQuery) {
                 return $contacts->filter(function ($contact) use ($searchQuery) {
@@ -58,15 +85,20 @@ class PipelineController extends Controller
                 });
             });
         }
-
+    
         return view('pipeline', [
             'statuses' => $statuses,
+            'countries' => $countries,
             'cities' => $cities,
+            'areas' => $areas, // Pass the areas list
+            'selectedCountry' => $selectedCountry,
             'selectedCity' => $selectedCity,
+            'selectedArea' => $selectedArea, // Pass selected area filter
             'searchQuery' => $searchQuery,
             'users' => User::all()
-        ]);
+        ]);        
     }
+    
 
     public function update(Request $request){
         $request->validate([

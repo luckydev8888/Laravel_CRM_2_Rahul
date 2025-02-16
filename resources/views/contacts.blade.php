@@ -104,6 +104,28 @@
         text-align: center; /* Change to left or right if needed */
         vertical-align: middle; /* Optional: Ensures alignment vertically */
     }
+    /* Limit the height of the comments column and add ellipsis */
+    .comments-column {
+        display: -webkit-box;
+        -webkit-line-clamp: 3; /* Limits to 3 lines */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 4.5em; /* Adjust based on font size */
+        white-space: normal; /* Allow multiline wrapping */
+        word-break: break-word; /* Prevent words from overflowing */
+    }
+
+    /* Show full content when hovering */
+    .comments-column:hover {
+        overflow: visible;
+        white-space: normal;
+        word-wrap: break-word;
+        z-index: 10;
+        position: relative;
+        background: white; /* Ensure readability */
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+    }
 </style>
 @endsection
 
@@ -122,11 +144,11 @@
                     <option value="CANARIAS" {{ Auth::user()->country == 'CANARIAS' ? 'selected' : ''}}>CANARIAS</option>
                     <option value="" {{ Auth::user()->is_admin ? 'selected' : '' }}>ALL</option>
                 </select>
-                <form action="{{ url('/contacts/import-excel') }}" method="POST" enctype="multipart/form-data">
+                <!-- <form action="{{ url('/contacts/import-excel') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="file" name="file" required>
                     <button type="submit" class="btn btn-primary">Upload Excel</button>
-                </form>
+                </form> -->
             </div>
             <table id="contacts" class="display" style="width: 1900px;">
                 <thead>
@@ -890,6 +912,7 @@ $(document).ready(function () {
             targets: 16,
             data: "comments",
             width: '80px',
+            className: "comments-column",
         }]
     });
 
@@ -913,8 +936,8 @@ $(document).ready(function () {
                 "options":[
                     { "value": "No contact", "display": "No Contact" },
                     { "value": "Call 1", "display": "Call 1" },
-                    { "value": "Call 2", "display": "Send Sample" },
-                    { "value": "Call 3", "display": "Sample Testing" },
+                    { "value": "Send Sample", "display": "Send Sample" },
+                    { "value": "Sample Testing", "display": "Sample Testing" },
                     { "value": "Standby", "display": "Standby" },
                     { "value": "Almost", "display": "Almost" },
                     { "value": "Customer", "display": "Customer" },
@@ -952,6 +975,13 @@ $(document).ready(function () {
         const tel1 = form.find('[name="tel1"]').val();
         const tel2 = form.find('[name="tel2"]').val();
         const id = form.find('[name="id"]').val(); // Only for edit
+
+        // If both fields are empty, submit immediately
+        if (!tel1 && !tel2) {
+            form.off('submit').submit(); // Allow submission
+            return;
+        }
+
 
         if (tel1) {
             checkDuplicatePhoneNumber(tel1, id, function(exists) {
@@ -1009,8 +1039,10 @@ $(document).ready(function () {
                     success: function (response) {
                         if (response.success) {
                             alert('Date updated successfully');
-                            // Optionally reload the DataTable
-                            table.ajax.reload();
+                            table.ajax.reload(null, false); // Reload the DataTable WITHOUT resetting pagination
+                            setTimeout(function () {
+                                reinitializeCellEditing(); // Re-enable inline editing
+                            }, 500); // Small delay to ensure table is fully reloaded
                         } else {
                             alert('Failed to update date');
                         }
@@ -1020,12 +1052,44 @@ $(document).ready(function () {
                         console.error(xhr.responseText);
                     },
                 });
+
             },
         });
 
         // Open the date-picker
         dateInput.datepicker('show');
     });
+
+    function reinitializeCellEditing() {
+        table.MakeCellsEditable({
+            onUpdate: myCallbackFunction,
+            columns: [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16],
+            inputCss:'my-input-class',
+            confirmationButton: { 
+                confirmCss: 'my-confirm-class',
+                cancelCss: 'my-cancel-class'
+            },
+            inputTypes: [
+                {
+                    "column": 4, 
+                    "type": "list",
+                    "options":[
+                        { "value": "No contact", "display": "No Contact" },
+                        { "value": "Call 1", "display": "Call 1" },
+                        { "value": "Send Sample", "display": "Send Sample" },
+                        { "value": "Sample Testing", "display": "Sample Testing" },
+                        { "value": "Standby", "display": "Standby" },
+                        { "value": "Almost", "display": "Almost" },
+                        { "value": "Customer", "display": "Customer" },
+                        { "value": "Not interested", "display": "Not interested" },
+                        { "value": "Not interesting", "display": "Not interesting" },
+                        { "value": "COCKROACH", "display": "COCKROACH" },
+                    ]
+                }
+            ],
+        });
+    }
+
 
 
     $('#contacts').on('click', '.sample-date-picker', function () {
@@ -1064,8 +1128,10 @@ $(document).ready(function () {
                     success: function (response) {
                         if (response.success) {
                             alert('Sample date updated successfully');
-                            // Optionally reload the DataTable
-                            table.ajax.reload();
+                            table.ajax.reload(null, false); // Reload the table WITHOUT resetting pagination
+                            setTimeout(function () {
+                                reinitializeCellEditing(); // Re-enable inline editing
+                            }, 500);
                         } else {
                             alert('Failed to update sample date');
                         }
@@ -1075,6 +1141,7 @@ $(document).ready(function () {
                         console.error(xhr.responseText);
                     },
                 });
+
             },
         });
 

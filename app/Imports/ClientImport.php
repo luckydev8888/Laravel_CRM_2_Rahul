@@ -6,7 +6,6 @@ use App\Models\Client;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -15,33 +14,21 @@ class ClientImport implements ToCollection, WithHeadingRow
     public function collection(Collection $rows)
     {
         $batchData = [];
-        $existingIds = Client::pluck('id')->toArray(); // Get existing IDs
+        $existingClients = Client::pluck('id')->toArray(); // Get existing IDs
 
         foreach ($rows as $row) {
             if (!isset($row['id']) || empty($row['id'])) {
                 continue; // Skip rows without an ID
             }
 
-            if (in_array($row['id'], $existingIds)) {
-                continue; // Skip if ID already exists
-            }
-
+            // Convert Excel serial numbers to valid date format
             $date = $this->convertExcelDate($row['date']);
             $samples = $this->convertExcelDate($row['samples']);
             $display = ($row['display'] === 'Yes') ? 1 : 0;
             $prices = ($row['prices'] === 'Yes') ? 1 : 0;
 
-            // // Validate phone numbers before inserting
-            // $validator = Validator::make($row->toArray(), [
-            //     'tel1' => 'nullable|unique:clients,tel1',
-            //     'tel2' => 'nullable|unique:clients,tel2',
-            // ]);
-
-            // if ($validator->fails()) {
-            //     continue; // Skip invalid data
-            // }
-
-            $batchData[] = [
+            // Prepare data for insert or update
+            $clientData = [
                 'id' => $row['id'],
                 'assigned' => $row['assigned'],
                 'date' => $date,
@@ -58,9 +45,17 @@ class ClientImport implements ToCollection, WithHeadingRow
                 'prices' => $prices,
                 'brand' => $row['brand'],
                 'comments' => $row['comments'],
-                'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now() // Update timestamp
             ];
+
+            if (in_array($row['id'], $existingClients)) {
+                // ✅ If the ID exists, UPDATE the record
+                Client::where('id', $row['id'])->update($clientData);
+            } else {
+                // ✅ If the ID does not exist, INSERT the record
+                $clientData['created_at'] = now();
+                $batchData[] = $clientData;
+            }
 
             // Insert data in chunks of 500 rows
             if (count($batchData) >= 500) {
@@ -75,6 +70,7 @@ class ClientImport implements ToCollection, WithHeadingRow
         }
     }
 
+    // Convert Excel date format (serial numbers) to MySQL date
     private function convertExcelDate($value)
     {
         if (is_numeric($value)) {

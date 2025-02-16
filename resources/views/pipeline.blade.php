@@ -19,15 +19,19 @@
 
     .filter-section {
         display: flex;
-        gap: 20px; /* Adjust spacing between filter groups */
+        flex-wrap: wrap; /* Allow filters to wrap on smaller screens */
+        gap: 10px; /* Reduce gap between filters */
         align-items: center;
-        padding: 10px 0;
+        padding: 10px;
+        justify-content: flex-start; /* Align items to the left */
     }
 
     .filter-group {
         display: flex;
-        align-items: center;
-        gap: 10px; /* Space between label and select/input */
+        flex-direction: column; /* Stack label and select/input */
+        align-items: flex-start; /* Align text to the left */
+        gap: 5px; /* Reduce space between label and input */
+        min-width: 180px; /* Set a minimum width for filters */
     }
 
     .filter-label {
@@ -36,12 +40,15 @@
         white-space: nowrap; /* Prevent label text from wrapping */
     }
 
-    .filter-select, .filter-input {
-        width: 200px; /* Adjust width as needed */
+    /* Adjust input and select width to prevent overflow */
+    .filter-select,
+    .filter-input {
+        width: 100%; /* Make filters take full width inside their container */
         font-size: 14px;
         border: 1px solid #ccc;
         border-radius: 4px;
         padding: 5px;
+        max-width: 250px; /* Prevent excessive stretching */
     }
 
     .status-column {
@@ -82,12 +89,12 @@
         border: 1px solid #ddd;
         border-radius: 5px;
         margin-bottom: 10px;
-        padding: 10px;
+        padding: 5px 20px 5px 5px;
         font-size: 14px;
         display: flex;
         flex-wrap: wrap;
         width: 100%; /* Ensure the card takes up the full width of the container */
-        height: 150px; /* Set a fixed height for uniformity */
+        height: 120px; /* Set a fixed height for uniformity */
         box-sizing: border-box; /* Include padding and border in the dimensions */
         position: relative; /* For positioning child elements like checkbox and edit button */
     }
@@ -102,7 +109,7 @@
     .contact-card .row {
         display: grid;
         grid-template-columns: 1fr 1fr; /* Two equal columns */
-        grid-gap: 10px; /* Add spacing between rows and columns */
+        grid-gap: 0; /* Add spacing between rows and columns */
         padding-left: 40px; /* Leave space for the checkbox */
         align-items: center; /* Vertically align items */
     }
@@ -177,32 +184,49 @@
 
     .filter-section {
         display: flex;
-        justify-content: space-between;
+        flex-wrap: wrap;
         align-items: center;
         gap: 15px;
-        position: sticky;
-        top: 0;
-        background-color: white;
-        padding: 10px 0;
-        z-index: 20;
-        border-bottom: 1px solid #ddd;
+        padding: 10px;
+        justify-content: space-between; /* Align filters to the left */
     }
 
+
+    /* Container to group country & city filters */
+    .filter-group-container {
+        display: flex;
+        align-items: center;
+        gap: 10px; /* Reduce space between country and city filter */
+    }
+
+    /* Fix width of individual filters */
     .filter-group {
-        margin-left: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+        min-width: 180px;
+        max-width: 220px;
     }
 
+    /* Ensure search box is aligned correctly */
     .search-box-group {
-        margin-left: -200px; /* Adjust the value for your desired position */
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        min-width: 220px;
+        max-width: 250px;
     }
 
 
-    .filter-section select,
-    .filter-section input {
-        padding: 5px;
+    /* Ensure all select inputs take the same width */
+    .filter-select, 
+    .filter-input {
+        width: 100%;
         font-size: 14px;
         border: 1px solid #ccc;
         border-radius: 4px;
+        padding: 5px;
     }
 
     .action-buttons-container {
@@ -247,6 +271,23 @@
         font-size: 14px; /* Ensure consistent font size */
     }
 
+    /* Fix responsiveness */
+    @media (max-width: 768px) {
+        .filter-section {
+            justify-content: center; /* Center filters on smaller screens */
+        }
+
+        .filter-group-container {
+            flex-direction: column; /* Stack country & city filters on small screens */
+            align-items: center;
+        }
+
+        .search-box-group {
+            width: 100%;
+            align-items: center;
+        }
+    }
+
 </style>
 @endsection
 
@@ -255,15 +296,43 @@
 <div style="background-color:#f8f9fa">
     <!-- Filter and Action Buttons -->
     <div class="filter-section">
-        <div class="filter-group">
-            <label for="city-filter" class="filter-label">City:</label>
-            <select id="city-filter" class="filter-select">
-                <option value="">All</option>
-                @foreach ($cities as $city)
-                    <option value="{{ $city }}" {{ $selectedCity === $city ? 'selected' : '' }}>{{ $city }}</option>
-                @endforeach
-            </select>
+        <div class="filter-group-container">
+            <!-- Country Filter -->
+            <div class="filter-group">
+                <label for="country-filter" class="filter-label">Country:</label>
+                <select id="country-filter" class="filter-select">
+                    <option value="">All</option>
+                    @foreach ($countries as $country)
+                        <option value="{{ $country }}" {{ $selectedCountry === $country ? 'selected' : '' }}>{{ $country }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- City Filter -->
+            <div class="filter-group">
+                <label for="city-filter" class="filter-label">City:</label>
+                <select id="city-filter" class="filter-select">
+                    <option value="">All</option>
+                    @foreach ($cities as $city)
+                        <option value="{{ $city }}" {{ $selectedCity === $city ? 'selected' : '' }}>{{ $city }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- Area Filter -->
+            <div class="filter-group">
+                <label for="area-filter" class="filter-label">Area:</label>
+                <select id="area-filter" class="filter-select">
+                    <option value="">All</option>
+                    @foreach ($areas as $area)
+                        <option value="{{ $area }}" {{ $selectedArea === $area ? 'selected' : '' }}>{{ $area }}</option>
+                    @endforeach
+                </select>
+            </div>
         </div>
+
+
+        <!-- Search Box -->
         <div class="filter-group search-box-group">
             <label for="search-box" class="filter-label">Search:</label>
             <input type="text" id="search-box" value="{{ $searchQuery }}" placeholder="Search..." class="filter-input">
@@ -311,14 +380,14 @@
                         @if (!empty($contact->contact))
                             {{ $contact->contact }}
                         @else
-                            No contact info
+                            
                         @endif
                     </p>
                     <p data-field="company">
                         @if (!empty($contact->company))
                             {{ $contact->company }}
                         @else
-                            No company
+                            
                         @endif
                     </p>
                     <p data-field="tel1">
@@ -326,7 +395,7 @@
                             {{ $contact->tel1 }}
                             <i class="fa-solid fa-phone-volume"></i>
                         @else
-                            No phone number
+                            
                         @endif
                     </p>
                     <p data-field="tel2">
@@ -334,24 +403,24 @@
                             {{ $contact->tel2 }}
                             <i class="fa-solid fa-phone-volume"></i>
                         @else
-                            No phone number
+                            
                         @endif
                     </p>
                     <p data-field="town">
                         @if (!empty($contact->town))
                             {{ $contact->town }}
                         @else
-                            No town
+                            
                         @endif
                     </p>
                     <p data-field="area">
                         @if (!empty($contact->area))
                             {{ $contact->area }}
                         @else
-                            No area
+                            
                         @endif
                     </p>
-                    <p style="text-align:right;">#{{ $contact->id }}</p>
+                    <p style="text-align:left;">#{{ $contact->id }}</p>
                     <p>
                         {{ $contact->formatted_date ?? 'N/A' }} 
                         <i class="fa fa-calendar calendar-icon" 
@@ -687,30 +756,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js"></script>
 <script>
     $(document).ready(function () {
-
-        // Initialize Select2 for the city filter with direct input
-        $('#city-filter').select2({
-            tags: true, // Enable custom input
-            placeholder: "Select or type a city", // Placeholder text
-            allowClear: true, // Clear button option
-            width: '100%' // Adjust width to fit the container
-        });
-
-        // Handle changes in the city select box
-        $('#city-filter').on('change', function () {
-            const city = $(this).val();
-            const search = $('#search-box').val();
-            window.location.href = `/pipeline?city=${city}&search=${search}`;
-        });
-
-        // Search box - Press Enter to display results
-        $('#search-box').on('keypress', function (e) {
-            if (e.which === 13) { // 13 is the keycode for Enter
-                const city = $('#city-filter').val();
-                const search = $(this).val();
-                window.location.href = `/pipeline?city=${city}&search=${search}`;
-            }
-        });
 
         const edit_tel1Input = document.querySelector("#edit_tel1");
         const edit_tel2Input = document.querySelector("#edit_tel2");
@@ -1144,6 +1189,51 @@
             const status = $(this).data('status');
             if (statusColors[status]) {
                 $(this).css('background-color', statusColors[status]);
+            }
+        });
+
+        // Initialize Select2 for country and city filters
+        $('#country-filter, #city-filter, #area-filter').select2({
+            placeholder: "Select an option",
+            allowClear: true,
+            width: '100%'
+        });
+
+        // Handle country filter change
+        $('#country-filter').on('change', function () {
+            const country = $(this).val();
+            const city = $('#city-filter').val();
+            const area = $('#area-filter').val();
+            const search = $('#search-box').val();
+            window.location.href = `/pipeline?country=${country}&city=${city}&area=${area}&search=${search}`;
+        });
+
+        // Handle city filter change
+        $('#city-filter').on('change', function () {
+            const country = $('#country-filter').val();
+            const area = $('#area-filter').val();
+            const city = $(this).val();
+            const search = $('#search-box').val();
+            window.location.href = `/pipeline?country=${country}&city=${city}&area=${area}&search=${search}`;
+        });
+
+        // Handle area filter change
+        $('#area-filter').on('change', function () {
+            const country = $('#country-filter').val();
+            const city = $('#city-filter').val();
+            const area = $(this).val();
+            const search = $('#search-box').val();
+            window.location.href = `/pipeline?country=${country}&city=${city}&area=${area}&search=${search}`;
+        });
+
+        // Handle search input (Press Enter to trigger search)
+        $('#search-box').on('keypress', function (e) {
+            if (e.which === 13) { // 13 is Enter key
+                const country = $('#country-filter').val();
+                const city = $('#city-filter').val();
+                const area = $('#area-filter').val();
+                const search = $(this).val();
+                window.location.href = `/pipeline?country=${country}&city=${city}&area=${area}&search=${search}`;
             }
         });
 });
