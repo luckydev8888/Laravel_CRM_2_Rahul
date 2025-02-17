@@ -98,7 +98,6 @@ class PipelineController extends Controller
             'users' => User::all()
         ]);        
     }
-    
 
     public function update(Request $request){
         $request->validate([
@@ -238,7 +237,6 @@ class PipelineController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to send email: ' . $e->getMessage()]);
         }
     }
-
 
     public function updateDate(Request $request) {
         $request->validate([
