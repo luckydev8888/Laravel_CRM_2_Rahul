@@ -42,7 +42,7 @@ class ClientController extends Controller
 
     public function editcolumn(Request $req) {
         $columns = ['id', 'assigned', 'id', 'date', 'status', 'score', 'company', 'contact', 'tel1', 'tel2', 'town',
-                    'area', 'samples', 'display', 'prices', 'brand', 'comments'];
+                    'area', 'country', 'samples', 'display', 'prices', 'brand', 'comments'];
         Client::where('id', $req->input('id'))->update( [$columns[$req->input('column')] => $req->input('data')] );
         return response('success', 200);
     }
@@ -104,7 +104,7 @@ class ClientController extends Controller
 
     public function get_list(Request $request) {
         $columns = ['id', 'assigned', 'id', 'date', 'status', 'score', 'company', 'contact', 'tel1', 'tel2', 'town',
-                    'area', 'samples', 'display', 'prices', 'brand', 'comments'];
+                    'area', 'country', 'samples', 'display', 'prices', 'brand', 'comments'];
         $totalData = Client::count();
         $totalFiltered = $totalData;
 
@@ -118,17 +118,13 @@ class ClientController extends Controller
         if ($limit == -1) $limit = 1844674407370955161;
         $search = $request->input('search.value', '');
 
-        if ($columnDatas[12]['search']['value'] == 'Yes') $columnDatas[12]['search']['value'] = '1';
-
-        if ($columnDatas[12]['search']['value'] == 'No') $columnDatas[12]['search']['value'] = '0';
-
-        if ($columnDatas[13]['search']['value'] == 'Yes') $columnDatas[12]['search']['value'] = '1';
-
-        if ($columnDatas[13]['search']['value'] == 'No') $columnDatas[12]['search']['value'] = '0';
-
         if ($columnDatas[14]['search']['value'] == 'Yes') $columnDatas[12]['search']['value'] = '1';
 
         if ($columnDatas[14]['search']['value'] == 'No') $columnDatas[12]['search']['value'] = '0';
+
+        if ($columnDatas[15]['search']['value'] == 'Yes') $columnDatas[12]['search']['value'] = '1';
+
+        if ($columnDatas[15]['search']['value'] == 'No') $columnDatas[12]['search']['value'] = '0';
 
 
         $clients = Client::where(function (Builder $q) use ($search) {
@@ -164,7 +160,8 @@ class ClientController extends Controller
                             ->orWhere('town', 'LIKE',"%{$search}%")
                             ->orWhere('area', 'LIKE',"%{$search}%")
                             ->orWhere('brand', 'LIKE',"%{$search}%")
-                            ->orWhere('comments', 'LIKE',"%{$search}%");
+                            ->orWhere('comments', 'LIKE',"%{$search}%")
+                            ->orWhere('country', 'LIKE',"%{$search}%");
                         })->where(function (Builder $q) use ($columnDatas, $columns, $country) {
                             foreach ($columnDatas as $key => $data) {
                                 if ($data['search']['value']) {
@@ -193,6 +190,7 @@ class ClientController extends Controller
                 $nestedData['tel2'] = $client->tel2;
                 $nestedData['town'] = $client->town;
                 $nestedData['area'] = $client->area;
+                $nestedData['country'] = $client->country;
                 $nestedData['samples'] = $client->samples;
                 $nestedData['display'] = $client->display ? 'Yes' : 'No';
                 $nestedData['prices'] = $client->prices ? 'Yes' : 'No';

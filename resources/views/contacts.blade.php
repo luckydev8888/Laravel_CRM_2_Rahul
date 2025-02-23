@@ -165,6 +165,7 @@
                         <th>Tel.2 (WhatsApp)</th>
                         <th>Town/City</th>
                         <th>Area/State</th>
+                        <th>Country</th>
                         <th style="min-width:20px;">Sam ple</th>
                         <th style="min-width:20px;">Dis play</th>
                         <th style="min-width:20px;">Pri ces</th>
@@ -866,7 +867,15 @@ $(document).ready(function () {
             data: "area",
             width: '60px',
         },{
-            targets: 12, // Index of the 'samples' column
+            targets: 12,  // Adjust index accordingly
+            data: "country",
+            width: '100px',
+            render: function (val) {
+                return val ? `<div class="editable-country">${val}</div>` : '<div class="editable-country">-</div>';
+            },
+            className: "contacts_country"
+        },{
+            targets: 13, // Index of the 'samples' column
             data: "samples",
             width: "100px",
             className: 'sample-column',
@@ -897,19 +906,19 @@ $(document).ready(function () {
                 }
             },
         },{
-            targets: 13,
+            targets: 14,
             data: "display",
             width: '10px',
         },{
-            targets: 14,
+            targets: 15,
             data: "prices",
             width: '10px',
         },{
-            targets: 15,
+            targets: 16,
             data: "brand",
             width: '30px',
         },{
-            targets: 16,
+            targets: 17,
             data: "comments",
             width: '80px',
             className: "comments-column",
@@ -923,7 +932,7 @@ $(document).ready(function () {
 
     table.MakeCellsEditable({
         onUpdate: myCallbackFunction,
-        columns: [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16],
+        columns: [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17],
         inputCss:'my-input-class',
         confirmationButton: { 
             confirmCss: 'my-confirm-class',
@@ -944,6 +953,17 @@ $(document).ready(function () {
                     { "value": "Not interested", "display": "Not interested" },
                     { "value": "Not interesting", "display": "Not interesting" },
                     { "value": "COCKROACH", "display": "COCKROACH" },
+                ]
+            },
+            {
+                "column": 12, // Adjust index for country column
+                "type": "list",
+                "options":[
+                    { "value": "SPAIN", "display": "SPAIN" },
+                    { "value": "PORTUGAL", "display": "PORTUGAL" },
+                    { "value": "USA", "display": "USA" },
+                    { "value": "CANARIAS", "display": "CANARIAS" },
+                    { "value": "FRANCE", "display": "FRANCE" }
                 ]
             }
         ],
@@ -1089,8 +1109,6 @@ $(document).ready(function () {
             ],
         });
     }
-
-
 
     $('#contacts').on('click', '.sample-date-picker', function () {
         const dateCell = $(this).closest('.sample-cell');

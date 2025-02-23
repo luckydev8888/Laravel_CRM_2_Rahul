@@ -28,6 +28,7 @@ class Client extends Model
         'tel2',
         'town',
         'area',
+        'country',
         'samples',
         'display',
         'prices',
